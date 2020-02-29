@@ -57,7 +57,7 @@ contract WhittMoney {
     }
 
     modifier noFloatGuy() {
-        require(floatOwner == address(0), "No float guy");
+        require(floatOwner == address(0), "Already a float guy");
         _;
     }
 
