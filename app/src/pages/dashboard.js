@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import DashboardSection from '../components/dashboard/DashboardSection'
-import MyComponent from '../components/dashboard/MyComponent'
+import MyComponent from '../components/dashboard/tabs/tab-content/DrizzleComponent'
 import { DrizzleContext } from '@drizzle/react-plugin'
 import DashboardTabs from '../components/dashboard/tabs/DashboardTabs'
 import { useRouter } from '../util/router'

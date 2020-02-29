@@ -1,7 +1,7 @@
 import React from 'react'
-import logo from '../../assets/drizzle_logo.png'
+import logo from '../../../../assets/drizzle_logo.png'
 import { newContextComponents } from '@drizzle/react-components'
-import Section from '../Section'
+import Section from '../../../Section'
 
 const { AccountData, ContractData, ContractForm } = newContextComponents
 

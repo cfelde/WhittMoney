@@ -1,6 +1,7 @@
 import React from 'react'
 import Section from '../Section'
 import SectionHeader from '../SectionHeader'
+import './DashboardSection.css'
 
 function DashboardSection(props) {
   return (

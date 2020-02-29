@@ -1,30 +1,28 @@
 import React, { useState } from 'react'
 import Tabs from './Tabs'
-import MyComponent from '../MyComponent'
+import MyComponent from './tab-content/DrizzleComponent'
 import { DrizzleContext } from '@drizzle/react-plugin'
-
-const ActiveTabContent = props => <div>{props.content}</div>
+import MakeOffer from './tab-content/MakeOffer'
+import OffersTable from './tab-content/OffersTable'
 
 function DashboardTabs(props) {
   const [activeTab, setActiveTab] = useState('Offers')
-
   return (
     <section className="section">
       <div className="container">
         <DrizzleContext.Consumer>
           {drizzleContext => {
             const { drizzle, drizzleState, initialized } = drizzleContext
-
             const tabList = [
               {
                 name: 'Offers',
                 icon: '',
-                content: 'Some offers!',
+                content: <OffersTable activeTab={activeTab} name={'Offers'} />,
               },
               {
                 name: 'Make Offer',
                 icon: '',
-                content: 'Soon to be a form where you can make offers',
+                content: <MakeOffer activeTab={activeTab} name={'Make Offer'} />,
               },
               {
                 name: 'Drizzle Examples',
@@ -32,21 +30,15 @@ function DashboardTabs(props) {
                 content: <MyComponent drizzle={drizzle} drizzleState={drizzleState} />,
               },
             ]
-
-            const activeTabContent = () => {
-              const activeIndex = tabList.findIndex(tab => {
-                return tab.name === activeTab
-              })
-              return tabList[activeIndex].content
-            }
-
             if (!initialized || !drizzleState.contracts || Object.keys(drizzleState.contracts).length !== 3) {
               return 'Loading...'
             }
             return (
               <>
                 <Tabs tabList={tabList} activeTab={activeTab} changeActiveTab={setActiveTab} />
-                <ActiveTabContent key={activeTab} content={activeTabContent()} />
+                {tabList.map(i => {
+                  return <div className={'drizzle-fix' + (activeTab === i.name ? ' active-tab' : '')}>{i.content}</div>
+                })}
               </>
             )
           }}
