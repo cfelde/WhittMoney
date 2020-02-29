@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "./logo.png";
+import logo from "../assets/drizzle_logo.png";
 import { newContextComponents} from "@drizzle/react-components"
 
 const {
