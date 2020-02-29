@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import NavbarContainer from "./NavbarContainer";
-import { Link } from "./../util/router.js";
-import { useAuth } from "./../util/auth.js";
-import "./Navbar.scss";
+import React, { useEffect, useState } from 'react'
+import NavbarContainer from './NavbarContainer'
+import { Link } from './../util/router.js'
+import { useAuth } from './../util/auth.js'
+import './Navbar.scss'
+import { useRouter } from './../util/router'
 
 function Navbar(props) {
-  const auth = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const auth = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <NavbarContainer spaced={props.spaced} color={props.color}>
@@ -19,7 +20,7 @@ function Navbar(props) {
             </Link>
           </div>
           <div
-            className={"navbar-burger burger" + (menuOpen ? " is-active" : "")}
+            className={'navbar-burger burger' + (menuOpen ? ' is-active' : '')}
             onClick={() => setMenuOpen(!menuOpen)}
           >
             <span></span>
@@ -27,7 +28,7 @@ function Navbar(props) {
             <span></span>
           </div>
         </div>
-        <div className={"navbar-menu" + (menuOpen ? " is-active" : "")}>
+        <div className={'navbar-menu' + (menuOpen ? ' is-active' : '')}>
           <div className="navbar-end">
             {auth.user && (
               <div className="navbar-item has-dropdown is-hoverable">
@@ -42,8 +43,8 @@ function Navbar(props) {
                     className="navbar-item"
                     to="/auth/signout"
                     onClick={e => {
-                      e.preventDefault();
-                      auth.signout();
+                      e.preventDefault()
+                      auth.signout()
                     }}
                   >
                     Sign out
@@ -53,7 +54,7 @@ function Navbar(props) {
             )}
 
             {!auth.user && (
-              <Link className="navbar-item" to="/auth/signin">
+              <Link className="navbar-item" to="/dashboard">
                 Launch DApp
               </Link>
             )}
@@ -61,7 +62,7 @@ function Navbar(props) {
         </div>
       </div>
     </NavbarContainer>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar

@@ -1,7 +1,7 @@
-import React from "react";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
-import Clients from "./Clients";
+import React from 'react'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
+import Clients from './Clients'
 
 function ClientsSection(props) {
   return (
@@ -22,25 +22,25 @@ function ClientsSection(props) {
         <Clients
           items={[
             {
-              name: "MakerDAO",
-              image: require("../assets/tech-maker.png"),
-              width: "150px"
+              name: 'MakerDAO',
+              image: require('../assets/tech-maker.png'),
+              width: '150px',
             },
             {
-              name: "Ethereum",
-                image: require("../assets/tech-ether.png"),
-                width: "150px"
+              name: 'Ethereum',
+              image: require('../assets/tech-ether.png'),
+              width: '150px',
             },
             {
-              name: "DAI",
-                image: require("../assets/tech-dai.png"),
-                width: "140px"
-            }
+              name: 'DAI',
+              image: require('../assets/tech-dai.png'),
+              width: '140px',
+            },
           ]}
         ></Clients>
       </div>
     </Section>
-  );
+  )
 }
 
-export default ClientsSection;
+export default ClientsSection

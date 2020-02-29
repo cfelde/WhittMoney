@@ -1,6 +1,6 @@
-import React from "react";
-import HeroSection2 from "./../components/HeroSection2";
-import TeamBiosSection from "./../components/TeamBiosSection";
+import React from 'react'
+import HeroSection2 from './../components/HeroSection2'
+import TeamBiosSection from './../components/TeamBiosSection'
 
 function AboutPage(props) {
   return (
@@ -22,7 +22,7 @@ function AboutPage(props) {
         subtitle=""
       ></TeamBiosSection>
     </>
-  );
+  )
 }
 
-export default AboutPage;
+export default AboutPage

@@ -1,8 +1,8 @@
-import React from "react";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
-import SectionButton from "./SectionButton";
-import "./HeroSection.scss";
+import React from 'react'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
+import SectionButton from './SectionButton'
+import './HeroSection.scss'
 
 function HeroSection(props) {
   return (
@@ -15,18 +15,9 @@ function HeroSection(props) {
       <div className="container">
         <div className="columns is-vcentered is-desktop">
           <div className="column is-5-desktop has-text-centered-touch">
-            <SectionHeader
-              title={props.title}
-              subtitle={props.subtitle}
-              size={1}
-              spaced={true}
-            ></SectionHeader>
+            <SectionHeader title={props.title} subtitle={props.subtitle} size={1} spaced={true}></SectionHeader>
             <div className="buttons is-inline-flex">
-              <SectionButton
-                parentColor={props.color}
-                size="medium"
-                onClick={props.buttonOnClick}
-              >
+              <SectionButton parentColor={props.color} size="medium" onClick={props.buttonOnClick}>
                 {props.buttonText}
               </SectionButton>
             </div>
@@ -40,7 +31,7 @@ function HeroSection(props) {
         </div>
       </div>
     </Section>
-  );
+  )
 }
 
-export default HeroSection;
+export default HeroSection

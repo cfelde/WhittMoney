@@ -1,6 +1,6 @@
-import React from "react";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
+import React from 'react'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
 
 function HeroSection2(props) {
   return (
@@ -20,7 +20,7 @@ function HeroSection2(props) {
         ></SectionHeader>
       </div>
     </Section>
-  );
+  )
 }
 
-export default HeroSection2;
+export default HeroSection2

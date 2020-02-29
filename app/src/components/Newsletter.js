@@ -1,27 +1,27 @@
-import React, { useState } from "react";
-import SectionButton from "./SectionButton";
+import React, { useState } from 'react'
+import SectionButton from './SectionButton'
 
 function Newsletter(props) {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const [email, setEmail] = useState('')
+  const [subscribed, setSubscribed] = useState(false)
 
   const handleSubmit = () => {
     if (email) {
-      setSubscribed(true);
+      setSubscribed(true)
       // Parent component can optionally
       // find out when subscribed.
-      props.onSubscribed && props.onSubscribed();
+      props.onSubscribed && props.onSubscribed()
       // Subscribe them
     }
-  };
+  }
 
   return (
     <>
       {subscribed === false && (
         <form
           onSubmit={e => {
-            e.preventDefault();
-            handleSubmit();
+            e.preventDefault()
+            handleSubmit()
           }}
         >
           <div className="field is-grouped">
@@ -34,11 +34,7 @@ function Newsletter(props) {
               ></input>
             </div>
             <div className="control">
-              <SectionButton
-                parentColor={props.parentColor}
-                size={props.size}
-                type="submit"
-              >
+              <SectionButton parentColor={props.parentColor} size={props.size} type="submit">
                 {props.buttonText}
               </SectionButton>
             </div>
@@ -48,7 +44,7 @@ function Newsletter(props) {
 
       {subscribed === true && <>{props.subscribedMessage}</>}
     </>
-  );
+  )
 }
 
-export default Newsletter;
+export default Newsletter

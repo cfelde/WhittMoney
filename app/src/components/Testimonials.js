@@ -1,7 +1,7 @@
-import React from "react";
-import CenteredColumns from "./CenteredColumns";
-import Avatar from "./Avatar";
-import "./Testimonials.scss";
+import React from 'react'
+import CenteredColumns from './CenteredColumns'
+import Avatar from './Avatar'
+import './Testimonials.scss'
 
 function Testimonials(props) {
   return (
@@ -16,16 +16,14 @@ function Testimonials(props) {
               <p className="Testimonials__quote">"{item.bio}"</p>
               <div className="Testimonials__info">
                 <div className="has-text-weight-bold">{item.name}</div>
-                <div className="Testimonials__company link is-size-7">
-                  {item.company}
-                </div>
+                <div className="Testimonials__company link is-size-7">{item.company}</div>
               </div>
             </div>
           </div>
         </div>
       ))}
     </CenteredColumns>
-  );
+  )
 }
 
-export default Testimonials;
+export default Testimonials

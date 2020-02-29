@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
-import queryString from "query-string";
-import fakeAuth from "fake-auth";
+import React, { useState, useEffect, useContext, createContext } from 'react'
+import queryString from 'query-string'
+import fakeAuth from 'fake-auth'
 
 /*
     Handles authentication with fakeAuth, a library for prototyping ...
@@ -12,64 +12,64 @@ import fakeAuth from "fake-auth";
     ... correct ones for your given auth service.
   */
 
-const authContext = createContext();
+const authContext = createContext()
 
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().
 export function ProvideAuth({ children }) {
-  const auth = useProvideAuth();
-  return <authContext.Provider value={auth}>{children}</authContext.Provider>;
+  const auth = useProvideAuth()
+  return <authContext.Provider value={auth}>{children}</authContext.Provider>
 }
 
 // Hook for child components to get the auth object ...
 // ... and update when it changes.
 export const useAuth = () => {
-  return useContext(authContext);
-};
+  return useContext(authContext)
+}
 
 // Provider hook that creates auth object and handles state
 function useProvideAuth() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null)
 
   const signup = (email, password) => {
     return fakeAuth.signup(email, password).then(user => {
-      setUser(user);
-      return user;
-    });
-  };
+      setUser(user)
+      return user
+    })
+  }
 
   const signin = (email, password) => {
     return fakeAuth.signin(email, password).then(user => {
-      setUser(user);
-      return user;
-    });
-  };
+      setUser(user)
+      return user
+    })
+  }
 
   const signinWithProvider = provider => {
     return fakeAuth.signinWithProvider(provider).then(user => {
-      setUser(user);
-      return user;
-    });
-  };
+      setUser(user)
+      return user
+    })
+  }
 
   const signout = () => {
     return fakeAuth.signout().then(() => {
-      setUser(false);
-    });
-  };
+      setUser(false)
+    })
+  }
 
   const sendPasswordResetEmail = email => {
-    return fakeAuth.sendPasswordResetEmail(email);
-  };
+    return fakeAuth.sendPasswordResetEmail(email)
+  }
 
   const confirmPasswordReset = (password, code) => {
     // If no reset code passed in then fetch it automatically from current url.
     // [CHANGING AUTH SERVICES]: If not passing in the code as the second ...
     // ... arg above then make sure getFromQueryString() below has the ...
     // ... correct url parameter name (it might not be "code").
-    const resetCode = code || getFromQueryString("code");
-    return fakeAuth.confirmPasswordReset(password, resetCode);
-  };
+    const resetCode = code || getFromQueryString('code')
+    return fakeAuth.confirmPasswordReset(password, resetCode)
+  }
 
   // Subscribe to user on mount
   // [CHANGING AUTH SERVICES]: Not all auth services have a subscription ...
@@ -77,12 +77,12 @@ function useProvideAuth() {
   // ... this effect and use the commented out one below.
   useEffect(() => {
     const unsubscribe = fakeAuth.onChange(user => {
-      setUser(user);
-    });
+      setUser(user)
+    })
 
     // Call unsubscribe on cleanup
-    return () => unsubscribe();
-  }, []);
+    return () => unsubscribe()
+  }, [])
 
   // Fetch user on mount
   // [CHANGING AUTH SERVICES]: If your auth service doesn't have a subscribe ...
@@ -103,10 +103,10 @@ function useProvideAuth() {
     signinWithProvider,
     signout,
     sendPasswordResetEmail,
-    confirmPasswordReset
-  };
+    confirmPasswordReset,
+  }
 }
 
 const getFromQueryString = key => {
-  return queryString.parse(window.location.search)[key];
-};
+  return queryString.parse(window.location.search)[key]
+}

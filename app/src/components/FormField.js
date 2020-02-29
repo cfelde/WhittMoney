@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react'
 
 function FormField(props) {
   return (
     <div className="field">
       <div className="control">
-        {props.type === "textarea" && (
+        {props.type === 'textarea' && (
           <textarea
             className="textarea is-medium"
             type={props.type}
@@ -14,7 +14,7 @@ function FormField(props) {
           ></textarea>
         )}
 
-        {props.type !== "textarea" && (
+        {props.type !== 'textarea' && (
           <input
             className="input is-medium"
             type={props.type}
@@ -27,7 +27,7 @@ function FormField(props) {
 
       {props.error && <p className="help is-danger">{props.error.message}</p>}
     </div>
-  );
+  )
 }
 
-export default FormField;
+export default FormField
