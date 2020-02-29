@@ -19,27 +19,17 @@ function DashboardPage(props) {
   }, [router])
 
   return (
-    <DrizzleContext.Consumer>
-      {drizzleContext => {
-        const { drizzle, drizzleState, initialized } = drizzleContext
-
-        if (!initialized || !drizzleState.contracts || Object.keys(drizzleState.contracts).length !== 3) {
-          return 'Loading...'
-        }
-        return (
-          <>
-            <DashboardTabs />
-            <DashboardSection
-              color="white"
-              size="large"
-              title="Whitt Dashboard"
-              subtitle="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aperiam, at cumque cupiditate debitis deleniti dolor est id ipsa itaque iusto, magnam maxime officia pariatur possimus provident reprehenderit sapiente sequi!"
-            ></DashboardSection>
-            {initialized && <MyComponent drizzle={drizzle} drizzleState={drizzleState} />}
-          </>
-        )
-      }}
-    </DrizzleContext.Consumer>
+    <>
+      <DashboardTabs />
+      {/*
+      <DashboardSection
+        color="white"
+        size="large"
+        title="Whitt Dashboard"
+        subtitle="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aperiam, at cumque cupiditate debitis deleniti dolor est id ipsa itaque iusto, magnam maxime officia pariatur possimus provident reprehenderit sapiente sequi!"
+      ></DashboardSection>
+*/}
+    </>
   )
 }
 

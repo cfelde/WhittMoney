@@ -1,53 +1,59 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Tabs from './Tabs'
+import MyComponent from '../MyComponent'
+import { DrizzleContext } from '@drizzle/react-plugin'
 
 const ActiveTabContent = props => <div>{props.content}</div>
 
-const tabList = [
-  {
-    name: 'Offers',
-    icon: '',
-    content: 'Soon to be a list of offers',
-  },
-  {
-    name: 'Make Offer',
-    icon: '',
-    content: 'Soon to be a form where you can make offers',
-  },
-]
+function DashboardTabs(props) {
+  const [activeTab, setActiveTab] = useState('Offers')
 
-class DashboardTabs extends React.Component {
-  constructor(props) {
-    super(props)
+  return (
+    <section className="section">
+      <div className="container">
+        <DrizzleContext.Consumer>
+          {drizzleContext => {
+            const { drizzle, drizzleState, initialized } = drizzleContext
 
-    this.state = {
-      activeTab: 'Offers',
-    }
-  }
+            const tabList = [
+              {
+                name: 'Offers',
+                icon: '',
+                content: 'Some offers!',
+              },
+              {
+                name: 'Make Offer',
+                icon: '',
+                content: 'Soon to be a form where you can make offers',
+              },
+              {
+                name: 'Drizzle Examples',
+                icon: '',
+                content: <MyComponent drizzle={drizzle} drizzleState={drizzleState} />,
+              },
+            ]
 
-  changeActiveTab(tab) {
-    this.setState({ activeTab: tab })
-  }
+            const activeTabContent = () => {
+              const activeIndex = tabList.findIndex(tab => {
+                return tab.name === activeTab
+              })
+              return tabList[activeIndex].content
+            }
 
-  activeTabContent() {
-    const activeIndex = tabList.findIndex(tab => {
-      return tab.name === this.state.activeTab
-    })
-
-    return tabList[activeIndex].content
-  }
-
-  render() {
-    return (
-      <section className="section">
-        <div className="container">
-          <Tabs tabList={tabList} activeTab={this.state.activeTab} changeActiveTab={this.changeActiveTab.bind(this)} />
-
-          <ActiveTabContent key={this.state.activeTab} content={this.activeTabContent()} />
-        </div>
-      </section>
-    )
-  }
+            if (!initialized || !drizzleState.contracts || Object.keys(drizzleState.contracts).length !== 3) {
+              return 'Loading...'
+            }
+            return (
+              <>
+                <Tabs tabList={tabList} activeTab={activeTab} changeActiveTab={setActiveTab} />
+                <ActiveTabContent key={activeTab} content={activeTabContent()} />
+              </>
+            )
+          }}
+        </DrizzleContext.Consumer>
+      </div>
+    </section>
+  )
 }
 
 export default DashboardTabs
