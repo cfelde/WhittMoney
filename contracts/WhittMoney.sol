@@ -47,6 +47,8 @@ contract WhittMoney {
         dai.approve(_rtoken, uint(-1));
         require(dai.transferFrom(msg.sender, address(this), _lockedAmount), "Transfer failure");
         require(rtoken.mintWithNewHat(_lockedAmount, recipients, proportions), "RDai mint failure");
+
+        emit NewWhitt(fixedOwner, lockedAmount, lockedDuration, dealValue);
     }
 
     modifier onlyFixedGuy() {
@@ -66,8 +68,13 @@ contract WhittMoney {
     function fixedExit() external onlyFixedGuy {
         require(lockedTimestamp < now || fixedOwner == address(0), "Locked");
         require(lockedAmount > 0, "No value locked");
-        require(rtoken.redeemAndTransfer(msg.sender, lockedAmount), "RDai redeem failure");
+
+        uint _lockedAmount = lockedAmount;
         lockedAmount = 0;
+
+        require(rtoken.redeemAndTransfer(msg.sender, _lockedAmount), "RDai redeem failure");
+
+        emit FixedExit(fixedOwner, floatOwner, _lockedAmount, dealValue);
     }
 
     // Anyone can call the floatEnter assuming the deal is not already locked. When doing so
@@ -89,5 +96,11 @@ contract WhittMoney {
         proportions[0] = uint32(1);
 
         rtoken.createHat(recipients, proportions, true);
+
+        emit FloatEnter(fixedOwner, floatOwner, lockedAmount, dealValue);
     }
+
+    event NewWhitt(address indexed fixedOwner, uint lockedAmount, uint lockedDuration, uint dealValue);
+    event FixedExit(address indexed fixedOwner, address indexed floatOwner, uint lockedAmount, uint dealValue);
+    event FloatEnter(address indexed fixedOwner, address indexed floatOwner, uint lockedAmount, uint dealValue);
 }
