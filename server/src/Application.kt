@@ -83,6 +83,7 @@ fun Application.module(testing: Boolean = false) {
 }
 
 class OrderRequest @JsonCreator constructor(
+    @JsonProperty("address") val address: String,
     @JsonProperty("collateral") val collateral: Long,
     @JsonProperty("fixedRate") val fixedRate: Long,
     @JsonProperty("duration") val duration: Long
@@ -93,6 +94,7 @@ class Order (
     orderRequest: OrderRequest
 ) {
     val id: Long = id
+    val address: String = orderRequest.address
     val collateral: Long = orderRequest.collateral
     val fixedRate: Long = orderRequest.fixedRate
     val duration: Long = orderRequest.duration
