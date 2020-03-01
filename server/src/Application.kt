@@ -14,6 +14,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.jackson.jackson
 import io.ktor.locations.Locations
+import io.ktor.locations.patch
 import io.ktor.request.path
 import io.ktor.request.receive
 import io.ktor.response.respond
@@ -70,6 +71,17 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.OK, order.id)
         }
 
+        post("/order/fulfill") {
+            val fulfillRequest = call.receive<FulfillRequest>()
+            if (orders.containsKey(fulfillRequest.orderId)) {
+                orders[fulfillRequest.orderId]?.fulfilled = true
+
+                call.respond(HttpStatusCode.OK, "ok")
+            } else {
+                call.respond(HttpStatusCode.BadRequest, "Order does not exist")
+            }
+        }
+
         delete("/order") {
             val orderId = call.receive<Long>()
             if (!orders.containsKey(orderId)) {
@@ -84,9 +96,15 @@ fun Application.module(testing: Boolean = false) {
 
 class OrderRequest @JsonCreator constructor(
     @JsonProperty("address") val address: String,
+    @JsonProperty("creatorAddress") val creatorAddress: String,
     @JsonProperty("collateral") val collateral: Long,
-    @JsonProperty("fixedRate") val fixedRate: Long,
-    @JsonProperty("duration") val duration: Long
+    @JsonProperty("desiredReward") val desiredReward: Long,
+    @JsonProperty("duration") val duration: Long,
+    @JsonProperty("fulfilled") val fulfilled: Boolean
+)
+
+class FulfillRequest @JsonCreator constructor(
+    @JsonProperty("orderId") val orderId: Long
 )
 
 class Order (
@@ -95,8 +113,10 @@ class Order (
 ) {
     val id: Long = id
     val address: String = orderRequest.address
+    val creatorAddress: String = orderRequest.creatorAddress
     val collateral: Long = orderRequest.collateral
-    val fixedRate: Long = orderRequest.fixedRate
+    val desiredReward: Long = orderRequest.desiredReward
     val duration: Long = orderRequest.duration
+    var fulfilled: Boolean = orderRequest.fulfilled
 }
 

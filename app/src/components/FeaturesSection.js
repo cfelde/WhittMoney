@@ -22,27 +22,33 @@ function FeaturesSection(props) {
         <Features
           items={[
             {
-              title: 'Instant Swaps',
+              title: 'Fixed fee paid up-front',
               description:
-                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+                'Whitt gives you the opportunity to get fixed, up-front paid interest rate on your collateral, with a trustless, safe, time-bound deal.',
               image: require('../assets/undraw_transfer_money_rywa.svg'),
             },
             {
-              title: 'Invest',
+              title: 'Investment Opportunity',
               description:
-                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+                'By betting on future interest rates, you can benefit from collateral several times higher then your available capital.',
               image: require('../assets/undraw_investing_7u74.svg'),
             },
             {
-              title: 'Decentralized',
+              title: 'Raises the bar over CeFi',
               description:
-                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+                "It's not only safe, trustless and transparent. It's simply better and way more efficient than traditional finance interest rate swaps - complicated legal agreements with risk of insolvency. Did we mention that the fixed interest rate is available instantly?",
               image: require('../assets/undraw_connected_world_wuay.svg'),
             },
             {
               title: 'Save',
               description:
-                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+                'investment | initial APY | Stable fee offer | average APY change | ROI\n' +
+                '7000 | 8% | 7% | 0        | 14%\n' +
+                '7000 | 8% | 7% | -1% | 0%\n' +
+                '7000 | 8% | 7% | +1% | 28%\n' +
+                '7000 | 8% | 7% | +2% | 42%\n' +
+                '\n' +
+                'Beign a fixed-rate up-front payment provider gives the opportunity for much bigger ROI with fairly low loss exposure.',
               image: require('../assets/undraw_Savings_dwkw.svg'),
             },
           ]}

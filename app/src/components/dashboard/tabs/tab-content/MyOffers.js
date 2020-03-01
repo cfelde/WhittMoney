@@ -32,7 +32,7 @@ export default props => {
   // destructure drizzle and drizzleState from props
   const { drizzle, drizzleState } = props
   const [offersList, setOffersList] = useState([])
-  const [acceptingOffer, setAcceptingOffer] = useState(false)
+  const [reclaiming, setReclaiming] = useState(false)
 
   let networkName = drizzleState.web3.networkId === 42 ? 'kovan' : ''
   useEffect(() => {
@@ -45,9 +45,9 @@ export default props => {
     fetchData()
   }, [])
 
-  async function handleClick(offerId, whittAddress) {
-    if (acceptingOffer) {
-      addToast("We're currently in the process of fulfilling an offer. Please complete this before continuing.", {
+  async function handleClick(whittAddress) {
+    if (reclaiming) {
+      addToast("We're currently in the process of reclaiming an offer. Please complete this before continuing.", {
         appearance: 'error',
         autoDismiss: true,
       })
@@ -55,60 +55,44 @@ export default props => {
     }
 
     try {
-      setAcceptingOffer(true)
-      let utils = drizzle.web3.utils
+      setReclaiming(true)
       let web3 = drizzle.web3
-      let daiAddress = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+      let rdaiAddress = '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB'
 
-      let daiInstance = new web3.eth.Contract(DaiJson.abi, daiAddress)
+      let rdaiInstance = new web3.eth.Contract(RdaiJson.abi, rdaiAddress)
       let whittInstance = new web3.eth.Contract(WhittJson.abi, whittAddress)
-      console.log(daiInstance)
-      console.log('Rdai instance:')
-      await daiInstance.methods
-        .approve(whittAddress, utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'))
-        .send({ from: drizzleState.accounts[0] })
 
-      await whittInstance.methods.floatEnter().send({ from: drizzleState.accounts[0] })
+      await whittInstance.methods.fixedExit().send({ from: drizzleState.accounts[0] })
+      await rdaiInstance.methods.redeemAll().send({ from: drizzleState.accounts[0] })
 
-      const createOrderReq = await axios.post(
-        '/api/order/fulfill',
-        { orderId: offerId },
-        { headers: { 'Content-Type': 'application/json' } }
-      )
+      addToast('The order was successfully reclaimed!', {
+        appearance: 'success',
+        autoDismiss: true,
+      })
 
-      if (createOrderReq.status === 200) {
-        setAcceptingOffer(false)
-        addToast('The order was successfully fulfilled!', {
-          appearance: 'success',
-          autoDismiss: true,
-        })
-      } else {
-        addToast('The order was fulfilled but we failed to update the server side.', {
+      setReclaiming(false)
+    } catch (err) {
+      setReclaiming(false)
+      addToast(
+        'An error occurred while reclaiming the offer. The contract may still be locked. For more details, see the JavaScript Console.',
+        {
           appearance: 'error',
           autoDismiss: true,
           duration: 12000,
-        })
-        setAcceptingOffer(false)
-      }
-    } catch (err) {
-      setAcceptingOffer(false)
-      addToast('An error occurred while accepting the offer. For more details, see the JavaScript Console.', {
-        appearance: 'error',
-        autoDismiss: true,
-        duration: 12000,
-      })
+        }
+      )
       console.error(err)
     }
   }
 
   return (
     <>
-      {offersList.filter(i => !i.fulfilled).length === 0 && (
-        <p>We're either still loading or it doesn't seem that there are any offers yet.</p>
+      {offersList.filter(i => i.creatorAddress === drizzleState.accounts[0]).length === 0 && (
+        <p>We're either still loading or it doesn't seem that you have created any offers yet.</p>
       )}
 
       {offersList
-        .filter(i => !i.fulfilled)
+        .filter(i => i.creatorAddress === drizzleState.accounts[0])
         .map(i => {
           return (
             <div key={i.id} className="card card-offer">
@@ -136,10 +120,10 @@ export default props => {
                   href="#"
                   className="card-footer-item"
                   onClick={() => {
-                    handleClick(i.id, i.address)
+                    handleClick(i.address)
                   }}
                 >
-                  Fill Order
+                  Reclaim Collateral
                 </a>
               </footer>
             </div>

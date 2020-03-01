@@ -9,6 +9,7 @@
     "@drizzle/store": "^1.5.1",
     "@truffle/contract": "^4.1.11",
     "analytics": "0.3.0",
+    "axios": "^0.19.2",
     "big-integer": "^1.6.48",
     "bulma": "0.7.5",
     "bulma-slider": "^2.0.0",
@@ -22,6 +23,7 @@
     "react-dom": "^16.11.0",
     "react-router-dom": "5.1.2",
     "react-scripts": "3.2.0",
+    "react-toast-notifications": "^2.4.0",
     "react-transition-group": "^1.2.1"
   },
   "scripts": {

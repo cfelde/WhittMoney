@@ -4,6 +4,7 @@ import MyComponent from './tab-content/DrizzleComponent'
 import { DrizzleContext } from '@drizzle/react-plugin'
 import MakeOffer from './tab-content/MakeOffer'
 import OffersTable from './tab-content/OffersTable'
+import MyOffers from './tab-content/MyOffers'
 
 function DashboardTabs(props) {
   const [activeTab, setActiveTab] = useState('Offers')
@@ -17,13 +18,22 @@ function DashboardTabs(props) {
               {
                 name: 'Offers',
                 icon: '',
-                content: <OffersTable activeTab={activeTab} name={'Offers'} />,
+                content: (
+                  <OffersTable drizzle={drizzle} drizzleState={drizzleState} activeTab={activeTab} name={'Offers'} />
+                ),
               },
               {
                 name: 'Make Offer',
                 icon: '',
                 content: (
                   <MakeOffer drizzle={drizzle} drizzleState={drizzleState} activeTab={activeTab} name={'Make Offer'} />
+                ),
+              },
+              {
+                name: 'My Offers',
+                icon: '',
+                content: (
+                  <MyOffers drizzle={drizzle} drizzleState={drizzleState} activeTab={activeTab} name={'My Offers'} />
                 ),
               },
               /*              {

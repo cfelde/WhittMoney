@@ -10,10 +10,7 @@ function DashboardPage(props) {
 
   // horrible hack to prevent drizzle error
   useEffect(() => {
-    console.log(router.history)
-    if (router.history.action === 'POP') {
-      console.debug('This is a direct navigation')
-    } else {
+    if (router.history.action !== 'POP') {
       window.location.reload()
     }
   }, [router])

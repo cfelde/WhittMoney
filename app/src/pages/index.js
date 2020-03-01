@@ -18,7 +18,7 @@ function IndexPage(props) {
         backgroundImage=""
         backgroundImageOpacity={1}
         title="Interest rate Swaps on DeFi"
-        subtitle="Whitt is a decentralized marketplace for interest rate swaps leveraging DeFi, the DAO savings rate, and Chai."
+        subtitle="A trustless interest rate swap marketplace leveraging DeFi savings protocols"
         buttonText="Launch DApp"
         image={require('../assets/undraw_ethereum_fb7n.svg')}
         buttonOnClick={() => {
@@ -40,7 +40,7 @@ function IndexPage(props) {
         backgroundImage=""
         backgroundImageOpacity={1}
         title="Features"
-        subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud."
+        subtitle="Whitt is a trustless interest rate swap marketplace leveraging DeFi savings protocols, built using DAI, rDAI and MakerDAO"
       ></FeaturesSection>
       <TeamBiosSection
         color="light"
