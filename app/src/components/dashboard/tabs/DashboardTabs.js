@@ -26,11 +26,11 @@ function DashboardTabs(props) {
                   <MakeOffer drizzle={drizzle} drizzleState={drizzleState} activeTab={activeTab} name={'Make Offer'} />
                 ),
               },
-              {
+              /*              {
                 name: 'Drizzle Examples',
                 icon: '',
                 content: <MyComponent drizzle={drizzle} drizzleState={drizzleState} />,
-              },
+              },*/
             ]
             if (!initialized) {
               return 'Loading...'

@@ -7,7 +7,7 @@ function TeamBios(props) {
   return (
     <CenteredColumns>
       {props.people.map((person, index) => (
-        <div className="column is-half-tablet is-one-third-desktop is-flex" key={index}>
+        <div className="column is-half-tablet is-one-quarter-desktop is-flex" key={index}>
           <div className="TeamBios__card card is-flex">
             <div className="TeamBios__card-content card-content is-flex has-text-centered">
               <div className="TeamBios__avatar-wrapper">
@@ -16,7 +16,16 @@ function TeamBios(props) {
               <div className="TeamBios__details">
                 <p className="is-size-5">{person.name}</p>
                 <p className="is-size-7 is-uppercase has-text-weight-semibold">{person.role}</p>
-                <p className="TeamBios__bio">{person.bio}</p>
+                <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                  <span className="icon">
+                    <i className="fab fa-linkedin"></i>
+                  </span>
+                </a>
+                <a href={person.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <span className="icon">
+                    <i className="fab fa-github"></i>
+                  </span>
+                </a>
               </div>
             </div>
           </div>

@@ -48,8 +48,8 @@ function AppWrapper(props) {
             size="normal"
             backgroundImage=""
             backgroundImageOpacity={1}
-            copyright="© 2019 Company"
-            logo="https://uploads.divjoy.com/logo.svg"
+            copyright="© 2020 Whitt Team"
+            logo={require('../assets/whitt.svg')}
           ></Footer>
         </>
       </Router>

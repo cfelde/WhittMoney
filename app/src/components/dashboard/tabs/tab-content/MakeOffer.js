@@ -2,10 +2,14 @@ import React, { useState } from 'react'
 import logo from '../../../../assets/drizzle_logo.png'
 import { newContextComponents } from '@drizzle/react-components'
 import Section from '../../../Section'
-import WhittMoney from '../../../../contracts/WhittMoney.json'
+import WhittMoneyJson from '../../../../contracts/WhittMoney.json'
+import DaiJson from '../../../../contracts/IERC20.json'
+import RdaiJson from '../../../../contracts/RTokenLike.json'
 const contract = require('@truffle/contract')
 const { AccountData, ContractData, ContractForm } = newContextComponents
-const WhittMoneyContract = contract(WhittMoney)
+const WhittMoneyContract = contract(WhittMoneyJson)
+const RdaiContract = contract(RdaiJson)
+const DaiContract = contract(DaiJson)
 
 export default props => {
   // destructure drizzle and drizzleState from props
@@ -16,20 +20,49 @@ export default props => {
     e.preventDefault()
     let utils = drizzle.web3.utils
     let web3 = drizzle.web3
+    let daiAddress = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+    let rdaiAddress = '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB'
     WhittMoneyContract.setProvider(web3.currentProvider)
 
-    console.log(WhittMoneyContract)
-
-    let inst = await WhittMoneyContract.new(
-      '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
-      '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB',
+    let whittInstance = await WhittMoneyContract.new(
+      daiAddress,
+      rdaiAddress,
+      utils.toWei('1'),
+      60 * 1,
       utils.toWei('0.1'),
-      60 * 5,
-      utils.toWei('0.01'),
-      { from: drizzleState.accounts[0], gasLimit: 3000000 }
+      { from: drizzleState.accounts[0], gas: 2000000 }
     )
 
-    console.log(inst)
+    console.log(whittInstance)
+
+    let rdaiInstance = new web3.eth.Contract(RdaiJson.abi, rdaiAddress)
+    let daiInstance = new web3.eth.Contract(DaiJson.abi, daiAddress)
+    console.log(daiInstance)
+    console.log('Rdai instance:')
+    console.log(rdaiInstance)
+    await daiInstance.methods
+      .approve(whittInstance.address, utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'))
+      .send({ from: drizzleState.accounts[0] })
+
+    console.log(
+      'Spender approved: ' +
+        (
+          await daiInstance.methods
+            .allowance(drizzleState.accounts[0], whittInstance.address)
+            .call({ from: drizzleState.accounts[0] })
+        ).toString(16)
+    )
+
+    await whittInstance.init({ from: drizzleState.accounts[0] })
+    console.log('Ready..')
+    await whittInstance.floatEnter({ from: drizzleState.accounts[0] })
+
+    await new Promise(r => setTimeout(r, 70000))
+
+    await whittInstance.fixedExit({ from: drizzleState.accounts[0] })
+    await rdaiInstance.methods.redeemAll().send({ from: drizzleState.accounts[0] })
+
+    console.log('Done..')
   }
 
   return (
