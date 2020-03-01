@@ -16,7 +16,7 @@ let rtokenAddress = "0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB";
 
 let lockedAmount = web3.utils.toWei("680"); // How much DAI to lock up as collateral
 let lockedDuration = 60 * 5; // For how long, in seconds, the deal is locked
-let dealValue = web3.utils.toWei("5"); // How much up front payment is required in exchange of the collateral
+let dealValue = web3.utils.toWei("5"); // How much up front DAI payment is required in exchange of the collateral
 
 let wm = await deployer.deploy(whittMoney, daiAddress, rtokenAddress, lockedAmount, lockedDuration, dealValue);
 let wmAddress = wm.address;
