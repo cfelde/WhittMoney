@@ -37,18 +37,6 @@ contract WhittMoney {
         lockedAmount = _lockedAmount;
         lockedDuration = _lockedDuration;
         dealValue = _dealValue;
-
-        address[] memory recipients = new address[](1);
-        recipients[0] = msg.sender;
-
-        uint32[] memory proportions = new uint32[](1);
-        proportions[0] = uint32(1);
-
-        dai.approve(_rtoken, uint(-1));
-        require(dai.transferFrom(msg.sender, address(this), _lockedAmount), "Transfer failure");
-        require(rtoken.mintWithNewHat(_lockedAmount, recipients, proportions), "RDai mint failure");
-
-        emit NewWhitt(fixedOwner, lockedAmount, lockedDuration, dealValue);
     }
 
     modifier onlyFixedGuy() {
@@ -61,18 +49,33 @@ contract WhittMoney {
         _;
     }
 
+    function init() external onlyFixedGuy {
+        address[] memory recipients = new address[](1);
+        recipients[0] = msg.sender;
+
+        uint32[] memory proportions = new uint32[](1);
+        proportions[0] = uint32(1);
+
+        dai.approve(address(rtoken), uint(-1));
+        require(dai.transferFrom(msg.sender, address(this), lockedAmount), "Transfer failure");
+        require(rtoken.mintWithNewHat(lockedAmount, recipients, proportions), "RDai mint failure");
+
+        emit NewWhitt(fixedOwner, lockedAmount, lockedDuration, dealValue);
+    }
+
     // Until someone has locked in the deal the fixed side who also called the constructor
     // may exit the deal at any time by withdrawing the collateral. If the deal has been
     // locked, they may only withdraw the collateral after the lockup period.
 
     function fixedExit() external onlyFixedGuy {
-        require(lockedTimestamp < now || fixedOwner == address(0), "Locked");
+        require(lockedTimestamp < now || floatOwner == address(0), "Locked");
         require(lockedAmount > 0, "No value locked");
 
         uint _lockedAmount = lockedAmount;
         lockedAmount = 0;
 
-        require(rtoken.redeemAndTransfer(msg.sender, _lockedAmount), "RDai redeem failure");
+        payInterestInternal();
+        require(rtoken.redeemAndTransferAll(msg.sender), "RDai redeem failure");
 
         emit FixedExit(fixedOwner, floatOwner, _lockedAmount, dealValue);
     }
@@ -95,9 +98,21 @@ contract WhittMoney {
         uint32[] memory proportions = new uint32[](1);
         proportions[0] = uint32(1);
 
+        payInterestInternal();
         rtoken.createHat(recipients, proportions, true);
 
         emit FloatEnter(fixedOwner, floatOwner, lockedAmount, dealValue);
+    }
+
+    function payInterest() external {
+        payInterestInternal();
+    }
+
+    function payInterestInternal() internal {
+        rtoken.payInterest(fixedOwner);
+        if (floatOwner != address(0)) {
+            rtoken.payInterest(floatOwner);
+        }
     }
 
     event NewWhitt(address indexed fixedOwner, uint lockedAmount, uint lockedDuration, uint dealValue);

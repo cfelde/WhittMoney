@@ -15,8 +15,8 @@ contract("When testing MillionDai, it:", async accounts => {
         let rdai = await fakeRToken.deployed();
 
         let wm = await whittMoney.new(dai.address, rdai.address, 1000, 0, 10);
-        let txHash = wm.transactionHash;
-        let tx1 = await truffleAssert.createTransactionResult(wm, txHash);
+        await dai.approve(wm.address, 10000000);
+        let tx1 = await wm.init();
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
             return ev.fixedOwner.toString() === accounts[0].toString()
                 && ev.lockedAmount.toString(10) === "1000"
@@ -44,8 +44,8 @@ contract("When testing MillionDai, it:", async accounts => {
         let rdai = await fakeRToken.deployed();
 
         let wm = await whittMoney.new(dai.address, rdai.address, 2000, 500, 20, {from: accounts[1]});
-        let txHash = wm.transactionHash;
-        let tx1 = await truffleAssert.createTransactionResult(wm, txHash);
+        await dai.approve(wm.address, 10000000);
+        let tx1 = await wm.init({from: accounts[1]});
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
             return ev.fixedOwner.toString() === accounts[1].toString()
                 && ev.lockedAmount.toString(10) === "2000"
@@ -72,8 +72,8 @@ contract("When testing MillionDai, it:", async accounts => {
         let rdai = await fakeRToken.deployed();
 
         let wm = await whittMoney.new(dai.address, rdai.address, 1000000, 1000, 200000, {from: accounts[1]});
-        let txHash = wm.transactionHash;
-        let tx1 = await truffleAssert.createTransactionResult(wm, txHash);
+        await dai.approve(wm.address, 10000000);
+        let tx1 = await wm.init({from: accounts[1]});
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
             return ev.fixedOwner.toString() === accounts[1].toString()
                 && ev.lockedAmount.toString(10) === "1000000"
@@ -100,8 +100,8 @@ contract("When testing MillionDai, it:", async accounts => {
         let rdai = await fakeRToken.deployed();
 
         let wm = await whittMoney.new(dai.address, rdai.address, 1000000, 3, 200000, {from: accounts[1]});
-        let txHash = wm.transactionHash;
-        let tx1 = await truffleAssert.createTransactionResult(wm, txHash);
+        await dai.approve(wm.address, 10000000);
+        let tx1 = await wm.init({from: accounts[1]});
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
             return ev.fixedOwner.toString() === accounts[1].toString()
                 && ev.lockedAmount.toString(10) === "1000000"
