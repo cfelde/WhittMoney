@@ -55,65 +55,68 @@ contract ATokenLike is IERC20 {
         address indexed _to
     );
 
+    uint private debug;
+    address private debugAddress;
+
     constructor() public {}
 
-    function redirectInterestStream(address _to) external {}
+    function redirectInterestStream(address) external {}
 
-    function redirectInterestStreamOf(address _from, address _to) external {}
+    function redirectInterestStreamOf(address, address) external {}
 
-    function allowInterestRedirectionTo(address _to) external {}
+    function allowInterestRedirectionTo(address) external {}
 
-    function redeem(uint256 _amount) external {}
+    function redeem(uint256) external {}
 
-    function mintOnDeposit(address _account, uint256 _amount) external {}
+    function mintOnDeposit(address, uint256) external {}
 
-    function burnOnLiquidation(address _account, uint256 _value) external {}
+    function burnOnLiquidation(address, uint256) external {}
 
-    function transferOnLiquidation(address _from, address _to, uint256 _value) external {}
+    function transferOnLiquidation(address, address, uint256) external {}
 
-    function balanceOf(address _user) public view returns(uint256) {
-        return 0;
+    function balanceOf(address) public view returns(uint256) {
+        return debug;
     }
 
-    function principalBalanceOf(address _user) external view returns(uint256) {
-        return 0;
+    function principalBalanceOf(address) external view returns(uint256) {
+        return debug;
     }
 
 
     function totalSupply() public view returns(uint256) {
-        return 0;
+        return debug;
     }
 
 
-    function isTransferAllowed(address _user, uint256 _amount) public view returns (bool) {
-        return true;
+    function isTransferAllowed(address, uint256) public view returns (bool) {
+        return debug == 0;
     }
 
-    function getUserIndex(address _user) external view returns(uint256) {
-        return 0;
+    function getUserIndex(address) external view returns(uint256) {
+        return debug;
     }
 
-    function getInterestRedirectionAddress(address _user) external view returns(address) {
-        return address(0);
+    function getInterestRedirectionAddress(address) external view returns(address) {
+        return debugAddress;
     }
 
-    function getRedirectedBalance(address _user) external view returns(uint256) {
-        return 0;
+    function getRedirectedBalance(address) external view returns(uint256) {
+        return debug;
     }
 
     function transfer(address, uint256) external returns (bool) {
-        return true;
+        return debug == 0;
     }
 
     function allowance(address, address) external view returns (uint256) {
-        return 0;
+        return debug;
     }
 
-    function approve(address spender, uint256 amount) external returns (bool) {
-        return true;
+    function approve(address, uint256) external returns (bool) {
+        return debug == 0;
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
-        return true;
+    function transferFrom(address, address, uint256) external returns (bool) {
+        return debug == 0;
     }
 }

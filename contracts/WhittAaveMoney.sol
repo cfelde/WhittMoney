@@ -1,13 +1,19 @@
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./ATokenLike.sol";
-import "./LendingPoolLike.sol";
+import "./aave/ATokenLike.sol";
+import "./aave/LendingPoolLike.sol";
 
 // Contract represents an interest rate swap between floating and fixed rates,
 // using the whitt.money protocol. See https://whitt.money for more details.
 
 // Contract created during the ETHLondon 2020 hackathon..
+
+// This contract is a proof of concept using Aave rather than rDAI.
+// While WhittMoney has been deployed and tested on Kovan, WhittAaveMoney
+// is missing a bit of setup and similar. It should however not be a big
+// effort to complete this and thereby be able to enjoy aDAI on Whitt.
+// You can run local tests on this contract, with tests in whittAaveMoney.js.
 
 contract WhittAaveMoney {
     IERC20 public dai;

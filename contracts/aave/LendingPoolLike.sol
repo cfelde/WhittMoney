@@ -89,55 +89,55 @@ contract LendingPoolLike {
         uint256 _timestamp
     );
 
-    function deposit(address _reserve, uint256 _amount, uint16 _referralCode)
+    function deposit(address, uint256, uint16)
     external
     payable
     {}
 
     function redeemUnderlying(
-        address _reserve,
-        address payable _user,
-        uint256 _amount,
-        uint256 _aTokenBalanceAfterRedeem
+        address,
+        address payable,
+        uint256,
+        uint256
     )
     external
     {}
 
     function borrow(
-        address _reserve,
-        uint256 _amount,
-        uint256 _interestRateMode,
-        uint16 _referralCode
+        address,
+        uint256,
+        uint256,
+        uint16
     )
     external
     {}
 
-    function repay(address _reserve, uint256 _amount, address payable _onBehalfOf)
+    function repay(address, uint256, address payable)
     external
     payable
     {}
 
-    function swapBorrowRateMode(address _reserve)
+    function swapBorrowRateMode(address)
     external
     {}
 
-    function rebalanceStableBorrowRate(address _reserve, address _user)
+    function rebalanceStableBorrowRate(address, address)
     external
     {}
 
-    function setUserUseReserveAsCollateral(address _reserve, bool _useAsCollateral)
+    function setUserUseReserveAsCollateral(address, bool)
     external
     {}
 
     function liquidationCall(
-        address _collateral,
-        address _reserve,
-        address _user,
-        uint256 _purchaseAmount,
-        bool _receiveAToken
+        address,
+        address,
+        address,
+        uint256,
+        bool
     ) external payable {}
 
-    function flashLoan(address _receiver, address _reserve, uint256 _amount, bytes memory _params)
+    function flashLoan(address, address, uint256, bytes memory)
     public
     {}
 }
