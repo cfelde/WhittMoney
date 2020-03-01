@@ -5,6 +5,7 @@ import FeaturesSection from './../components/FeaturesSection'
 import TestimonialsSection from './../components/TestimonialsSection'
 import NewsletterSection from './../components/NewsletterSection'
 import { useRouter } from './../util/router.js'
+import TeamBiosSection from '../components/TeamBiosSection'
 
 function IndexPage(props) {
   const router = useRouter()
@@ -41,14 +42,14 @@ function IndexPage(props) {
         title="Features"
         subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud."
       ></FeaturesSection>
-      <TestimonialsSection
+      <TeamBiosSection
         color="light"
         size="medium"
         backgroundImage=""
         backgroundImageOpacity={1}
-        title="Here's what people are saying"
+        title="Meet the Team"
         subtitle=""
-      ></TestimonialsSection>
+      ></TeamBiosSection>
       <NewsletterSection
         color="white"
         size="medium"

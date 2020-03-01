@@ -2,6 +2,7 @@ import React from 'react'
 import Section from './Section'
 import SectionHeader from './SectionHeader'
 import TeamBios from './TeamBios'
+import array from 'lodash'
 
 function TeamBiosSection(props) {
   return (
@@ -20,38 +21,36 @@ function TeamBiosSection(props) {
           className="has-text-centered"
         ></SectionHeader>
         <TeamBios
-          people={[
+          people={array.shuffle([
             {
-              avatar: 'https://uploads.divjoy.com/pravatar-150x-68.jpeg',
-              name: 'John Smith',
-              role: 'Software Engineer',
-              bio:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo.',
-              twitterUrl: 'https://twitter.com',
-              facebookUrl: 'https://facebook.com',
-              linkedinUrl: 'https://linkedin.com',
+              avatar: require('../assets/team/josh.jpg'),
+              name: 'Joshua Richardson',
+              role: 'Blockchain Engineer',
+              githubUrl: 'https://github.com/josh-richardson/',
+              linkedinUrl: 'https://www.linkedin.com/in/josh-richardson/',
             },
             {
-              avatar: 'https://uploads.divjoy.com/pravatar-150x-35.jpeg',
-              name: 'Lisa Zinn',
-              role: 'Software Engineer',
-              bio:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo, corporis totam! Labore reprehenderit beatae magnam animi!',
-              twitterUrl: 'https://twitter.com',
-              facebookUrl: 'https://facebook.com',
-              linkedinUrl: 'https://linkedin.com',
+              avatar: require('../assets/team/christian.jpg'),
+              name: 'Christian Felde',
+              role: 'Blockchain Engineer',
+              githubUrl: 'https://github.com/cfelde/',
+              linkedinUrl: 'https://www.linkedin.com/in/cfelde/',
             },
             {
-              avatar: 'https://uploads.divjoy.com/pravatar-150x-16.jpeg',
-              name: 'Diana Low',
-              role: 'Designer',
-              bio:
-                'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo, corporis totam! Labore reprehenderit beatae magnam animi!',
-              twitterUrl: 'https://twitter.com',
-              facebookUrl: 'https://facebook.com',
-              linkedinUrl: 'https://linkedin.com',
+              avatar: require('../assets/team/ivaylo.jpg'),
+              name: 'Ivaylo Kirilov',
+              role: 'Blockchain Engineer',
+              githubUrl: 'https://github.com/iikirilov/',
+              linkedinUrl: 'https://www.linkedin.com/in/iikirilov/',
             },
-          ]}
+            {
+              avatar: require('../assets/team/krzysztof.jpg'),
+              name: 'Krzysztof Urbański',
+              role: 'Strategy & Development',
+              githubUrl: 'https://github.com/kurbanski/',
+              linkedinUrl: 'https://www.linkedin.com/in/krzysztofurbanski/',
+            },
+          ])}
         ></TeamBios>
       </div>
     </Section>

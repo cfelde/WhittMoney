@@ -1,6 +1,8 @@
 .TeamBios {
   &__card {
     flex-direction: column;
+    margin: auto;
+    width: 250px;
   }
 
   &__card-content {
@@ -13,8 +15,16 @@
     margin: 0 auto;
   }
 
+  &__avatar-wrapper > figure > img {
+    filter: grayscale(100%) drop-shadow(1px 1px 1px #222);
+  }
+
   &__details {
     margin-top: 20px;
+  }
+
+  &__details > a {
+    color: rgba(0, 209, 178, 0.7);
   }
 
   &__bio {
