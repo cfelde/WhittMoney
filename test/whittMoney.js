@@ -9,7 +9,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-contract("When testing MillionDai, it:", async accounts => {
+contract("When testing WhittMoney, it:", async accounts => {
     it("is possible to deploy and exit an unlocked swap", async () => {
         let dai = await fakeERC20.deployed();
         let rdai = await fakeRToken.deployed();
