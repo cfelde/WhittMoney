@@ -1,7 +1,7 @@
-import React from "react";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
-import Features from "./Features";
+import React from 'react'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
+import Features from './Features'
 
 function FeaturesSection(props) {
   return (
@@ -22,35 +22,34 @@ function FeaturesSection(props) {
         <Features
           items={[
             {
-              title: "Instant Swaps",
+              title: 'Instant Swaps',
               description:
-                "Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.",
-              image: require("../assets/undraw_transfer_money_rywa.svg")
+                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+              image: require('../assets/undraw_transfer_money_rywa.svg'),
             },
             {
-              title: "Invest",
+              title: 'Invest',
               description:
-                "Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.",
-              image:
-                require("../assets/undraw_investing_7u74.svg")
+                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+              image: require('../assets/undraw_investing_7u74.svg'),
             },
             {
-              title: "Decentralized",
+              title: 'Decentralized',
               description:
-                "Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.",
-              image: require("../assets/undraw_connected_world_wuay.svg")
+                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+              image: require('../assets/undraw_connected_world_wuay.svg'),
             },
             {
-              title: "Save",
+              title: 'Save',
               description:
-                "Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.",
-              image: require("../assets/undraw_Savings_dwkw.svg")
-            }
+                'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus.',
+              image: require('../assets/undraw_Savings_dwkw.svg'),
+            },
           ]}
         ></Features>
       </div>
     </Section>
-  );
+  )
 }
 
-export default FeaturesSection;
+export default FeaturesSection

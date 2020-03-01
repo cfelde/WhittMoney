@@ -1,18 +1,13 @@
-import React from "react";
-import "./Features.scss";
+import React from 'react'
+import './Features.scss'
 
 function Features(props) {
   return (
     <div className="Features">
       {props.items.map((item, index) => (
-        <div
-          className="Features__columns columns is-variable is-8 is-vcentered has-text-centered-mobile"
-          key={index}
-        >
+        <div className="Features__columns columns is-variable is-8 is-vcentered has-text-centered-mobile" key={index}>
           <div className="column is-half">
-            <h3 className="Features__title title has-text-weight-bold is-spaced is-3">
-              {item.title}
-            </h3>
+            <h3 className="Features__title title has-text-weight-bold is-spaced is-3">{item.title}</h3>
             <p className="subtitle">{item.description}</p>
           </div>
           <div className="column">
@@ -23,7 +18,7 @@ function Features(props) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-export default Features;
+export default Features

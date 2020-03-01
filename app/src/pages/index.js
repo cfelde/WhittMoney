@@ -1,13 +1,13 @@
-import React from "react";
-import HeroSection from "./../components/HeroSection";
-import ClientsSection from "./../components/ClientsSection";
-import FeaturesSection from "./../components/FeaturesSection";
-import TestimonialsSection from "./../components/TestimonialsSection";
-import NewsletterSection from "./../components/NewsletterSection";
-import { useRouter } from "./../util/router.js";
+import React from 'react'
+import HeroSection from './../components/HeroSection'
+import ClientsSection from './../components/ClientsSection'
+import FeaturesSection from './../components/FeaturesSection'
+import TestimonialsSection from './../components/TestimonialsSection'
+import NewsletterSection from './../components/NewsletterSection'
+import { useRouter } from './../util/router.js'
 
 function IndexPage(props) {
-  const router = useRouter();
+  const router = useRouter()
 
   return (
     <>
@@ -19,10 +19,10 @@ function IndexPage(props) {
         title="Interest rate Swaps on DeFi"
         subtitle="Whitt is a decentralized marketplace for interest rate swaps leveraging DeFi, the DAO savings rate, and Chai."
         buttonText="Launch DApp"
-        image={require("../assets/undraw_ethereum_fb7n.svg")}
+        image={require('../assets/undraw_ethereum_fb7n.svg')}
         buttonOnClick={() => {
           // Navigate to pricing page
-          router.push("/pricing");
+          router.push('/dashboard')
         }}
       ></HeroSection>
       <ClientsSection
@@ -61,7 +61,7 @@ function IndexPage(props) {
         subscribedMessage="You are now subscribed!"
       ></NewsletterSection>
     </>
-  );
+  )
 }
 
-export default IndexPage;
+export default IndexPage

@@ -1,7 +1,7 @@
-import React from "react";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
-import Newsletter from "./Newsletter";
+import React from 'react'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
+import Newsletter from './Newsletter'
 
 function NewsletterSection(props) {
   return (
@@ -16,12 +16,7 @@ function NewsletterSection(props) {
           <div className="column is-12 is-10-fullhd">
             <div className="columns is-vcentered">
               <div className="column is-half">
-                <SectionHeader
-                  title={props.title}
-                  subtitle={props.subtitle}
-                  size={3}
-                  spaced={false}
-                ></SectionHeader>
+                <SectionHeader title={props.title} subtitle={props.subtitle} size={3} spaced={false}></SectionHeader>
               </div>
               <div className="column is-half">
                 <Newsletter
@@ -37,7 +32,7 @@ function NewsletterSection(props) {
         </div>
       </div>
     </Section>
-  );
+  )
 }
 
-export default NewsletterSection;
+export default NewsletterSection

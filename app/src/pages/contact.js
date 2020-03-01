@@ -1,5 +1,5 @@
-import React from "react";
-import ContactSection from "./../components/ContactSection";
+import React from 'react'
+import ContactSection from './../components/ContactSection'
 
 function ContactPage(props) {
   return (
@@ -13,7 +13,7 @@ function ContactPage(props) {
       buttonText="Send message"
       showNameField={true}
     ></ContactSection>
-  );
+  )
 }
 
-export default ContactPage;
+export default ContactPage

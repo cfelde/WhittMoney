@@ -3,20 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@analytics/google-analytics": "0.2.2",
     "@drizzle/react-components": "^1.5.1",
     "@drizzle/react-plugin": "^1.5.1",
     "@drizzle/store": "^1.5.1",
+    "analytics": "0.3.0",
+    "big-integer": "^1.6.48",
+    "bulma": "0.7.5",
+    "fake-auth": "0.0.8",
+    "humanize-duration": "^3.22.0",
+    "mailchimp-api-v3": "1.13.1",
+    "node-sass": "4.13.0",
+    "query-string": "6.9.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0",
     "react-router-dom": "5.1.2",
-    "node-sass": "4.13.0",
-    "bulma": "0.7.5",
-    "query-string": "6.9.0",
-    "fake-auth": "0.0.8",
-    "analytics": "0.3.0",
-    "@analytics/google-analytics": "0.2.2",
-    "mailchimp-api-v3": "1.13.1"
+    "react-scripts": "3.2.0",
+    "react-transition-group": "^1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -26,6 +29,11 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
+    "husky": "^4.2.0"
   },
   "browserslist": {
     "production": [
@@ -38,5 +46,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }

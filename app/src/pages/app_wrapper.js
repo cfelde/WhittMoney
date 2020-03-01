@@ -1,24 +1,21 @@
-import React from "react";
-import "./../styles/global.scss";
-import Navbar from "./../components/Navbar";
-import IndexPage from "./index";
-import AboutPage from "./about";
-import ContactPage from "./contact";
-import DashboardPage from "./dashboard";
-import { Switch, Route, Router } from "./../util/router.js";
-import Footer from "./../components/Footer";
-import { ProvideAuth } from "./../util/auth.js";
+import React, { useEffect } from 'react'
+import './../styles/global.scss'
+import Navbar from './../components/Navbar'
+import IndexPage from './index'
+import AboutPage from './about'
+import ContactPage from './contact'
+import DashboardPage from './dashboard'
+import { Switch, Route, Router } from './../util/router.js'
+import Footer from './../components/Footer'
+import { ProvideAuth } from './../util/auth.js'
+import { useRouter } from './../util/router'
 
 function AppWrapper(props) {
   return (
     <ProvideAuth>
       <Router>
         <>
-          <Navbar
-            color="white"
-            spaced={true}
-            logo={require("../assets/whitt.svg")}
-          ></Navbar>
+          <Navbar color="white" spaced={true} logo={require('../assets/whitt.svg')}></Navbar>
 
           <Switch>
             <Route exact path="/" component={IndexPage} />
@@ -34,15 +31,14 @@ function AppWrapper(props) {
                 return (
                   <div
                     style={{
-                      padding: "50px",
-                      width: "100%",
-                      textAlign: "center"
+                      padding: '50px',
+                      width: '100%',
+                      textAlign: 'center',
                     }}
                   >
-                    The page <code>{location.pathname}</code> could not be
-                    found.
+                    The page <code>{location.pathname}</code> could not be found.
                   </div>
-                );
+                )
               }}
             />
           </Switch>
@@ -58,7 +54,7 @@ function AppWrapper(props) {
         </>
       </Router>
     </ProvideAuth>
-  );
+  )
 }
 
-export default AppWrapper;
+export default AppWrapper

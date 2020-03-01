@@ -1,43 +1,36 @@
-import React from "react";
-import DashboardSection from "./../components/DashboardSection";
-import MyComponent from "../components/MyComponent";
-import { DrizzleContext } from "@drizzle/react-plugin";
+import React, { useEffect } from 'react'
+import DashboardSection from '../components/dashboard/DashboardSection'
+import MyComponent from '../components/dashboard/tabs/tab-content/DrizzleComponent'
+import { DrizzleContext } from '@drizzle/react-plugin'
+import DashboardTabs from '../components/dashboard/tabs/DashboardTabs'
+import { useRouter } from '../util/router'
 
 function DashboardPage(props) {
-/*  const auth = useAuth();
-  const router = useRouter();
+  const router = useRouter()
 
-  // Redirect to signin
-  // if not signed in.
+  // horrible hack to prevent drizzle error
   useEffect(() => {
-    if (auth.user === false) {
-      router.push("/auth/signin");
+    console.log(router.history)
+    if (router.history.action === 'POP') {
+      console.debug('This is a direct navigation')
+    } else {
+      window.location.reload()
     }
-  }, [auth, router]);*/
+  }, [router])
 
   return (
-      <DrizzleContext.Consumer>
-          {drizzleContext => {
-              const {drizzle, drizzleState, initialized} = drizzleContext;
-
-              if(!initialized) {
-                  return "Loading..."
-              }
-              return (
-                  <>
-                      <DashboardSection
-                          color="white"
-                          size="large"
-                          title="Dashboard"
-                          subtitle="Dashboard components are coming to the Divjoy library soon. For now, you can implement a custom dashboard here after exporting your code."
-                      ></DashboardSection>
-                      <MyComponent drizzle={drizzle} drizzleState={drizzleState} />
-                  </>
-              )
-          }}
-      </DrizzleContext.Consumer>
-
-  );
+    <>
+      <DashboardTabs />
+      {/*
+      <DashboardSection
+        color="white"
+        size="large"
+        title="Whitt Dashboard"
+        subtitle="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aperiam, at cumque cupiditate debitis deleniti dolor est id ipsa itaque iusto, magnam maxime officia pariatur possimus provident reprehenderit sapiente sequi!"
+      ></DashboardSection>
+*/}
+    </>
+  )
 }
 
-export default DashboardPage;
+export default DashboardPage
