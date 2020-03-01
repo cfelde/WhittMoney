@@ -6,12 +6,10 @@ import TutorialToken from './contracts/TutorialToken.json'
 const options = {
   web3: {
     block: false,
-    customProvider: window.location.href.indexOf('localhost:3000') !== -1 ? new Web3('ws://localhost:8545') : undefined,
+    customProvider:
+      window.location.href.indexOf('localhaost:3000') !== -1 ? new Web3('ws://localhost:8545') : undefined,
   },
-  contracts: [SimpleStorage, ComplexStorage, TutorialToken],
-  events: {
-    SimpleStorage: ['StorageSet'],
-  },
+  contracts: [],
 }
 
 export default options

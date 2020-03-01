@@ -10,7 +10,7 @@ export default props => {
   const { drizzle, drizzleState } = props
   return (
     <Section color={props.color} size={props.size}>
-      <div className="container">
+      {/*   <div className="container">
         <div>
           <img src={logo} alt="drizzle-logo" />
           <h1>Drizzle Examples</h1>
@@ -104,7 +104,7 @@ export default props => {
           <strong>Single Device Data: </strong>
           <ContractData drizzle={drizzle} drizzleState={drizzleState} contract="ComplexStorage" method="singleDD" />
         </div>
-      </div>
+      </div>*/}
     </Section>
   )
 }

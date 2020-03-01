@@ -22,7 +22,9 @@ function DashboardTabs(props) {
               {
                 name: 'Make Offer',
                 icon: '',
-                content: <MakeOffer activeTab={activeTab} name={'Make Offer'} />,
+                content: (
+                  <MakeOffer drizzle={drizzle} drizzleState={drizzleState} activeTab={activeTab} name={'Make Offer'} />
+                ),
               },
               {
                 name: 'Drizzle Examples',
@@ -30,14 +32,18 @@ function DashboardTabs(props) {
                 content: <MyComponent drizzle={drizzle} drizzleState={drizzleState} />,
               },
             ]
-            if (!initialized || !drizzleState.contracts || Object.keys(drizzleState.contracts).length !== 3) {
+            if (!initialized) {
               return 'Loading...'
             }
             return (
               <>
                 <Tabs tabList={tabList} activeTab={activeTab} changeActiveTab={setActiveTab} />
                 {tabList.map(i => {
-                  return <div className={'drizzle-fix' + (activeTab === i.name ? ' active-tab' : '')}>{i.content}</div>
+                  return (
+                    <div key={i.name} className={'drizzle-fix' + (activeTab === i.name ? ' active-tab' : '')}>
+                      {i.content}
+                    </div>
+                  )
                 })}
               </>
             )

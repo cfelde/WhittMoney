@@ -33,7 +33,7 @@ export default props => {
     <>
       {offersList.map(i => {
         return (
-          <div className="card card-offer">
+          <div key={i.id} className="card card-offer">
             <header className="card-header">
               <p className="card-header-title">Offer #{i.id}</p>
             </header>
