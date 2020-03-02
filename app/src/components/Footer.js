@@ -19,20 +19,20 @@ function Footer(props) {
         </div>
         <div className="links right">
           <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
+          <a href="https://github.com/cfelde/WhittMoney" target="_blank" rel="noopener noreferrer">Source Code / GitHub</a>
         </div>
         <div className="social right">
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+          <a onClick={() => alert('We hope to have these soon!')} href="#!">
             <span className="icon">
               <i className="fab fa-twitter"></i>
             </span>
           </a>
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+          <a onClick={() => alert('We hope to have these soon!')} href="#!">
             <span className="icon">
               <i className="fab fa-facebook-f"></i>
             </span>
           </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+          <a onClick={() => alert('We hope to have these soon!')} href="#!">
             <span className="icon">
               <i className="fab fa-instagram"></i>
             </span>

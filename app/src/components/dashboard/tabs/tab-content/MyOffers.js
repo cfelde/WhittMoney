@@ -45,7 +45,7 @@ export default props => {
     fetchData()
   }, [])
 
-  async function handleClick(whittAddress) {
+  async function handleClick(id, whittAddress) {
     if (reclaiming) {
       addToast("We're currently in the process of reclaiming an offer. Please complete this before continuing.", {
         appearance: 'error',
@@ -65,12 +65,28 @@ export default props => {
       await whittInstance.methods.fixedExit().send({ from: drizzleState.accounts[0] })
       await rdaiInstance.methods.redeemAll().send({ from: drizzleState.accounts[0] })
 
-      addToast('The order was successfully reclaimed!', {
-        appearance: 'success',
-        autoDismiss: true,
-      })
 
+      const fulfillOrderReq = await axios.post(
+        '/api/order/fulfill',
+        { orderId: id },
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+
+      if (fulfillOrderReq.status === 200) {
+        addToast('The order was successfully reclaimed!', {
+          appearance: 'success',
+          autoDismiss: true,
+        })
+      } else {
+        addToast('The order was reclaimed but we failed to update the server side.', {
+          appearance: 'error',
+          autoDismiss: true,
+          duration: 12000,
+        })
+      }
       setReclaiming(false)
+
+
     } catch (err) {
       setReclaiming(false)
       addToast(
@@ -101,11 +117,8 @@ export default props => {
               </header>
               <div className="card-content">
                 <div className="content">
-                  {'Contract: ' + i.address}
-                  <br />
-
-                  {'Creator: ' + i.creatorAddress}
-                  <br />
+                  <p>Contract Address: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.address}>{i.address}</a></p>
+                  <p>Creator: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.creatorAddress}>{i.creatorAddress}</a></p>
 
                   {'Collateral: ' + i.collateral + ' DAI'}
                   <br />
@@ -120,7 +133,7 @@ export default props => {
                   href="#"
                   className="card-footer-item"
                   onClick={() => {
-                    handleClick(i.address)
+                    handleClick(i.id, i.address)
                   }}
                 >
                   Reclaim Collateral

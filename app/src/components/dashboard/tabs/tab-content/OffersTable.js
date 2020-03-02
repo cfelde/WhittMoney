@@ -70,13 +70,13 @@ export default props => {
 
       await whittInstance.methods.floatEnter().send({ from: drizzleState.accounts[0] })
 
-      const createOrderReq = await axios.post(
+      const fulfillOrderReq = await axios.post(
         '/api/order/fulfill',
         { orderId: offerId },
         { headers: { 'Content-Type': 'application/json' } }
       )
 
-      if (createOrderReq.status === 200) {
+      if (fulfillOrderReq.status === 200) {
         setAcceptingOffer(false)
         addToast('The order was successfully fulfilled!', {
           appearance: 'success',
@@ -117,12 +117,8 @@ export default props => {
               </header>
               <div className="card-content">
                 <div className="content">
-                  {'Contract: ' + i.address}
-                  <br />
-
-                  {'Creator: ' + i.creatorAddress}
-                  <br />
-
+                  <p>Contract Address: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.address}>{i.address}</a></p>
+                  <p>Creator: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.creatorAddress}>{i.creatorAddress}</a></p>
                   {'Collateral: ' + i.collateral + ' DAI'}
                   <br />
 

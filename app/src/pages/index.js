@@ -6,6 +6,7 @@ import TestimonialsSection from './../components/TestimonialsSection'
 import NewsletterSection from './../components/NewsletterSection'
 import { useRouter } from './../util/router.js'
 import TeamBiosSection from '../components/TeamBiosSection'
+import PresentationSection from '../components/PresentationSection'
 
 function IndexPage(props) {
   const router = useRouter()
@@ -42,8 +43,12 @@ function IndexPage(props) {
         title="Features"
         subtitle="Whitt is a trustless interest rate swap marketplace leveraging DeFi savings protocols, built using DAI, rDAI and MakerDAO"
       ></FeaturesSection>
-      <TeamBiosSection
+      <PresentationSection
+        title="Our Pitch"
         color="light"
+      />
+      <TeamBiosSection
+        color="white"
         size="medium"
         backgroundImage=""
         backgroundImageOpacity={1}
@@ -51,7 +56,7 @@ function IndexPage(props) {
         subtitle=""
       ></TeamBiosSection>
       <NewsletterSection
-        color="white"
+        color="light"
         size="medium"
         backgroundImage=""
         backgroundImageOpacity={1}

@@ -1,3 +1,8 @@
 .card-offer {
   margin-bottom: 20px;
 }
+
+
+.card-offer p {
+  margin-bottom: 5px !important;
+}

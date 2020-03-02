@@ -24,4 +24,12 @@
     max-width: 300px;
     margin: 30px auto;
   }
+
+  .item-desc > p.small-data {
+    font-size: 0.6em;
+  }
+
+  .item-desc > .table-row {
+    white-space: pre-line
+  }
 }
