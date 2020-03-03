@@ -7,7 +7,7 @@ import './OffersTable.css'
 import humanizeDuration from 'humanize-duration'
 import axios from 'axios'
 import RdaiJson from '../../../../contracts/RTokenLike'
-import WhittJson from '../../../../contracts/WhittMoney'
+import WhittJson from '../../../../contracts/WhittRDaiMoney'
 import DaiJson from '../../../../contracts/IERC20'
 import { useToasts } from 'react-toast-notifications'
 const { AccountData, ContractData, ContractForm } = newContextComponents

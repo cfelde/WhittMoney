@@ -3,18 +3,18 @@ const truffleAssert = require('truffle-assertions');
 
 const fakeRToken = artifacts.require("FakeRToken");
 const fakeERC20 = artifacts.require("FakeERC20");
-const whittMoney = artifacts.require("WhittMoney");
+const whittRDaiMoney = artifacts.require("WhittRDaiMoney");
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-contract("When testing WhittMoney, it:", async accounts => {
+contract("When testing WhittRDaiMoney, it:", async accounts => {
     it("is possible to deploy and exit an unlocked swap", async () => {
         let dai = await fakeERC20.deployed();
         let rdai = await fakeRToken.deployed();
 
-        let wm = await whittMoney.new(dai.address, rdai.address, 1000, 0, 10);
+        let wm = await whittRDaiMoney.new(dai.address, rdai.address, 1000, 0, 10);
         await dai.approve(wm.address, 10000000);
         let tx1 = await wm.init();
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
@@ -43,7 +43,7 @@ contract("When testing WhittMoney, it:", async accounts => {
         let dai = await fakeERC20.deployed();
         let rdai = await fakeRToken.deployed();
 
-        let wm = await whittMoney.new(dai.address, rdai.address, 2000, 500, 20, {from: accounts[1]});
+        let wm = await whittRDaiMoney.new(dai.address, rdai.address, 2000, 500, 20, {from: accounts[1]});
         await dai.approve(wm.address, 10000000);
         let tx1 = await wm.init({from: accounts[1]});
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
@@ -71,7 +71,7 @@ contract("When testing WhittMoney, it:", async accounts => {
         let dai = await fakeERC20.deployed();
         let rdai = await fakeRToken.deployed();
 
-        let wm = await whittMoney.new(dai.address, rdai.address, 1000000, 1000, 200000, {from: accounts[1]});
+        let wm = await whittRDaiMoney.new(dai.address, rdai.address, 1000000, 1000, 200000, {from: accounts[1]});
         await dai.approve(wm.address, 10000000);
         let tx1 = await wm.init({from: accounts[1]});
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
@@ -99,7 +99,7 @@ contract("When testing WhittMoney, it:", async accounts => {
         let dai = await fakeERC20.deployed();
         let rdai = await fakeRToken.deployed();
 
-        let wm = await whittMoney.new(dai.address, rdai.address, 1000000, 3, 200000, {from: accounts[1]});
+        let wm = await whittRDaiMoney.new(dai.address, rdai.address, 1000000, 3, 200000, {from: accounts[1]});
         await dai.approve(wm.address, 10000000);
         let tx1 = await wm.init({from: accounts[1]});
         truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
