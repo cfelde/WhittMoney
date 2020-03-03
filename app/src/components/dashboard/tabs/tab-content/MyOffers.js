@@ -49,7 +49,6 @@ export default props => {
     if (reclaiming) {
       addToast("We're currently in the process of reclaiming an offer. Please complete this before continuing.", {
         appearance: 'error',
-        autoDismiss: true,
       })
       return
     }
@@ -57,14 +56,16 @@ export default props => {
     try {
       setReclaiming(true)
       let web3 = drizzle.web3
-      let rdaiAddress = '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB'
+      let rdaiAddress =
+        drizzleState.web3.networkId === 42
+          ? '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB'
+          : '0x261b45D85cCFeAbb11F022eBa346ee8D1cd488c0'
 
       let rdaiInstance = new web3.eth.Contract(RdaiJson.abi, rdaiAddress)
       let whittInstance = new web3.eth.Contract(WhittJson.abi, whittAddress)
 
       await whittInstance.methods.fixedExit().send({ from: drizzleState.accounts[0] })
       await rdaiInstance.methods.redeemAll().send({ from: drizzleState.accounts[0] })
-
 
       const fulfillOrderReq = await axios.post(
         '/api/order/fulfill',
@@ -75,25 +76,20 @@ export default props => {
       if (fulfillOrderReq.status === 200) {
         addToast('The order was successfully reclaimed!', {
           appearance: 'success',
-          autoDismiss: true,
         })
       } else {
         addToast('The order was reclaimed but we failed to update the server side.', {
           appearance: 'error',
-          autoDismiss: true,
           duration: 12000,
         })
       }
       setReclaiming(false)
-
-
     } catch (err) {
       setReclaiming(false)
       addToast(
         'An error occurred while reclaiming the offer. The contract may still be locked. For more details, see the JavaScript Console.',
         {
           appearance: 'error',
-          autoDismiss: true,
           duration: 12000,
         }
       )
@@ -117,8 +113,26 @@ export default props => {
               </header>
               <div className="card-content">
                 <div className="content">
-                  <p>Contract Address: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.address}>{i.address}</a></p>
-                  <p>Creator: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.creatorAddress}>{i.creatorAddress}</a></p>
+                  <p>
+                    Contract Address:{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={'https://kovan.etherscan.io/address/' + i.address}
+                    >
+                      {i.address}
+                    </a>
+                  </p>
+                  <p>
+                    Creator:{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={'https://kovan.etherscan.io/address/' + i.creatorAddress}
+                    >
+                      {i.creatorAddress}
+                    </a>
+                  </p>
 
                   {'Collateral: ' + i.collateral + ' DAI'}
                   <br />

@@ -43,10 +43,7 @@ function IndexPage(props) {
         title="Features"
         subtitle="Whitt is a trustless interest rate swap marketplace leveraging DeFi savings protocols, built using DAI, rDAI and MakerDAO"
       ></FeaturesSection>
-      <PresentationSection
-        title="Our Pitch"
-        color="light"
-      />
+      <PresentationSection title="Our Pitch" color="light" />
       <TeamBiosSection
         color="white"
         size="medium"

@@ -19,7 +19,9 @@ function Footer(props) {
         </div>
         <div className="links right">
           <Link to="/about">About</Link>
-          <a href="https://github.com/cfelde/WhittMoney" target="_blank" rel="noopener noreferrer">Source Code / GitHub</a>
+          <a href="https://github.com/cfelde/WhittMoney" target="_blank" rel="noopener noreferrer">
+            Source Code / GitHub
+          </a>
         </div>
         <div className="social right">
           <a onClick={() => alert('We hope to have these soon!')} href="#!">

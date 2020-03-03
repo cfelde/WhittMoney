@@ -48,13 +48,7 @@ function DashboardTabs(props) {
             return (
               <>
                 <Tabs tabList={tabList} activeTab={activeTab} changeActiveTab={setActiveTab} />
-                {tabList.map(i => {
-                  return (
-                    <div key={i.name} className={'drizzle-fix' + (activeTab === i.name ? ' active-tab' : '')}>
-                      {i.content}
-                    </div>
-                  )
-                })}
+                {tabList.filter(i => activeTab === i.name).map(i => i.content)}
               </>
             )
           }}

@@ -1,17 +1,11 @@
 import React, { useState } from 'react'
-import logo from '../../../../assets/drizzle_logo.png'
-import { newContextComponents } from '@drizzle/react-components'
-import Section from '../../../Section'
 import WhittMoneyJson from '../../../../contracts/WhittMoney.json'
 import DaiJson from '../../../../contracts/IERC20.json'
 import RdaiJson from '../../../../contracts/RTokenLike.json'
 import { useToasts } from 'react-toast-notifications'
 import axios from 'axios'
 const contract = require('@truffle/contract')
-const { AccountData, ContractData, ContractForm } = newContextComponents
 const WhittMoneyContract = contract(WhittMoneyJson)
-const RdaiContract = contract(RdaiJson)
-const DaiContract = contract(DaiJson)
 
 export default props => {
   // destructure drizzle and drizzleState from props
@@ -39,14 +33,12 @@ export default props => {
     if (desiredReward === 0 || daiToStake === 0) {
       addToast('You need to set a desired reward & an amount to stake before offer creation.', {
         appearance: 'error',
-        autoDismiss: true,
       })
       return
     }
     if (desiredReward * 2 >= daiToStake) {
       addToast('Reward should be less than half of the DAI to stake.', {
         appearance: 'error',
-        autoDismiss: true,
       })
       return
     }
@@ -55,7 +47,6 @@ export default props => {
         "We're currently in the process of creating an offer. Please allow this to finish or refresh the page to create a new one.",
         {
           appearance: 'error',
-          autoDismiss: true,
         }
       )
 
@@ -68,14 +59,19 @@ export default props => {
         "Now attempting to create your offer. Please note that you'll have to validate several transactions in MetaMask during this process.",
         {
           appearance: 'info',
-          autoDismiss: true,
         }
       )
 
       let utils = drizzle.web3.utils
       let web3 = drizzle.web3
-      let daiAddress = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
-      let rdaiAddress = '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB'
+      let daiAddress =
+        drizzleState.web3.networkId === 42
+          ? '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+          : '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+      let rdaiAddress =
+        drizzleState.web3.networkId === 42
+          ? '0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB'
+          : '0x261b45D85cCFeAbb11F022eBa346ee8D1cd488c0'
       WhittMoneyContract.setProvider(web3.currentProvider)
 
       let whittInstance = await WhittMoneyContract.new(
@@ -112,16 +108,6 @@ export default props => {
 
       await whittInstance.init({ from: drizzleState.accounts[0] })
 
-      /* Code to enter and finally exit.
-
-      console.log('Ready..')
-      await whittInstance.floatEnter({ from: drizzleState.accounts[0] })
-
-      await new Promise(r => setTimeout(r, 70000))
-
-
-
-      console.log('Done..')*/
       const createOrderReq = await axios.post(
         '/api/order/',
         {
@@ -139,12 +125,10 @@ export default props => {
         setDeploying(false)
         addToast('Your order was successfully created!', {
           appearance: 'success',
-          autoDismiss: true,
         })
       } else {
         addToast('The contract was deployed but server communication failed. Please try again.', {
           appearance: 'error',
-          autoDismiss: true,
           duration: 12000,
         })
         setDeploying(false)
@@ -156,13 +140,11 @@ export default props => {
           'A specific known MetaMask bug was encountered. In this instance, please try again immediately. Several attempts may be necessary but creation will succeed.',
           {
             appearance: 'warning',
-            autoDismiss: true,
           }
         )
       } else {
         addToast('An error occurred while creating your offer. For more details, see the JavaScript Console.', {
           appearance: 'error',
-          autoDismiss: true,
           duration: 12000,
         })
       }

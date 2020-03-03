@@ -13,6 +13,7 @@
     "big-integer": "^1.6.48",
     "bulma": "0.7.5",
     "bulma-slider": "^2.0.0",
+    "chalk": "^3.0.0",
     "fake-auth": "0.0.8",
     "humanize-duration": "^3.22.0",
     "lodash": "^4.17.15",
@@ -22,7 +23,7 @@
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "5.1.2",
-    "react-scripts": "3.2.0",
+    "react-scripts": "^3.4.0",
     "react-toast-notifications": "^2.4.0",
     "react-transition-group": "^1.2.1"
   },

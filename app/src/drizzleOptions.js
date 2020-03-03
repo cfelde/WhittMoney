@@ -1,7 +1,4 @@
 import Web3 from 'web3'
-import SimpleStorage from './contracts/SimpleStorage.json'
-import ComplexStorage from './contracts/ComplexStorage.json'
-import TutorialToken from './contracts/TutorialToken.json'
 
 const options = {
   web3: {

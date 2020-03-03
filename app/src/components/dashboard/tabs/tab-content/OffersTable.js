@@ -34,7 +34,6 @@ export default props => {
   const [offersList, setOffersList] = useState([])
   const [acceptingOffer, setAcceptingOffer] = useState(false)
 
-  let networkName = drizzleState.web3.networkId === 42 ? 'kovan' : ''
   useEffect(() => {
     async function fetchData() {
       let result = await axios.get('/api/book/')
@@ -49,7 +48,6 @@ export default props => {
     if (acceptingOffer) {
       addToast("We're currently in the process of fulfilling an offer. Please complete this before continuing.", {
         appearance: 'error',
-        autoDismiss: true,
       })
       return
     }
@@ -58,7 +56,10 @@ export default props => {
       setAcceptingOffer(true)
       let utils = drizzle.web3.utils
       let web3 = drizzle.web3
-      let daiAddress = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+      let daiAddress =
+        drizzleState.web3.networkId === 42
+          ? '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+          : '0x6B175474E89094C44Da98b954EedeAC495271d0F'
 
       let daiInstance = new web3.eth.Contract(DaiJson.abi, daiAddress)
       let whittInstance = new web3.eth.Contract(WhittJson.abi, whittAddress)
@@ -80,12 +81,10 @@ export default props => {
         setAcceptingOffer(false)
         addToast('The order was successfully fulfilled!', {
           appearance: 'success',
-          autoDismiss: true,
         })
       } else {
         addToast('The order was fulfilled but we failed to update the server side.', {
           appearance: 'error',
-          autoDismiss: true,
           duration: 12000,
         })
         setAcceptingOffer(false)
@@ -94,7 +93,6 @@ export default props => {
       setAcceptingOffer(false)
       addToast('An error occurred while accepting the offer. For more details, see the JavaScript Console.', {
         appearance: 'error',
-        autoDismiss: true,
         duration: 12000,
       })
       console.error(err)
@@ -117,8 +115,26 @@ export default props => {
               </header>
               <div className="card-content">
                 <div className="content">
-                  <p>Contract Address: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.address}>{i.address}</a></p>
-                  <p>Creator: <a target="_blank" rel="noopener noreferrer" href={"https://kovan.etherscan.io/address/" + i.creatorAddress}>{i.creatorAddress}</a></p>
+                  <p>
+                    Contract Address:{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={'https://kovan.etherscan.io/address/' + i.address}
+                    >
+                      {i.address}
+                    </a>
+                  </p>
+                  <p>
+                    Creator:{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={'https://kovan.etherscan.io/address/' + i.creatorAddress}
+                    >
+                      {i.creatorAddress}
+                    </a>
+                  </p>
                   {'Collateral: ' + i.collateral + ' DAI'}
                   <br />
 
