@@ -10,10 +10,6 @@ import RdaiJson from '../../../../contracts/RTokenLike'
 import WhittJson from '../../../../contracts/WhittMoney'
 import DaiJson from '../../../../contracts/IERC20'
 import { useToasts } from 'react-toast-notifications'
-const { AccountData, ContractData, ContractForm } = newContextComponents
-const contract = require('@truffle/contract')
-const RdaiContract = contract(RdaiJson)
-const DaiContract = contract(DaiJson)
 
 /*
 *   {
