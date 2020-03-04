@@ -1,6 +1,6 @@
-// Various steps needed for deploying and interacting with the WhittMoney contract.
+// Various steps needed for deploying and interacting with the WhittRDaiMoney contract.
 
-const whittMoney = artifacts.require("WhittMoney");
+const whittMoney = artifacts.require("WhittRDaiMoney");
 const erc20 = artifacts.require("IERC20");
 const rtoken = artifacts.require("RTokenLike");
 
@@ -21,7 +21,7 @@ let dealValue = web3.utils.toWei("5"); // How much up front DAI payment is requi
 let wm = await deployer.deploy(whittMoney, daiAddress, rtokenAddress, lockedAmount, lockedDuration, dealValue);
 let wmAddress = wm.address;
 
-console.log("Deployed WhittMoney: " + wmAddress);
+console.log("Deployed WhittRDaiMoney: " + wmAddress);
 
 let dai = await erc20.at(daiAddress);
 let rdai = await rtoken.at(rtokenAddress);

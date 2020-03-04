@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import WhittMoneyJson from '../../../../contracts/WhittMoney.json'
+import WhittMoneyJson from '../../../../contracts/WhittRDaiMoney.json'
 import DaiJson from '../../../../contracts/IERC20.json'
 import RdaiJson from '../../../../contracts/RTokenLike.json'
 import { useToasts } from 'react-toast-notifications'

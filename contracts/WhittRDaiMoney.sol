@@ -8,7 +8,7 @@ import "./RTokenLike.sol";
 
 // Contract created during the ETHLondon 2020 hackathon..
 
-contract WhittMoney {
+contract WhittRDaiMoney {
     IERC20 public dai;
     RTokenLike public rtoken;
 
