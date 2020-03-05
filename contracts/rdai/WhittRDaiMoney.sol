@@ -78,8 +78,9 @@ contract WhittRDaiMoney {
         require(_lockedDuration == lockedDuration, "Invalid locked duration");
         require(_dealValue == dealValue, "Invalid deal value");
 
-        floatSwapId = _swapId;
         lockedTimestamp = now + lockedDuration;
+
+        payInterestInternal();
 
         address[] memory recipients = new address[](1);
         recipients[0] = _owner;
@@ -87,7 +88,8 @@ contract WhittRDaiMoney {
         uint32[] memory proportions = new uint32[](1);
         proportions[0] = uint32(1);
 
-        payInterestInternal();
+        floatSwapId = _swapId;
+
         rtoken.createHat(recipients, proportions, true);
     }
 

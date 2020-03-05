@@ -44,9 +44,9 @@ contract WhittRDaiSwapFactory {
         // Transfer collateral from initiator to contract, then enter fixed side
         require(dai.transferFrom(msg.sender, swapAddress, _lockedAmount), "Transfer failure");
 
-        whittToken.mint(msg.sender, swapId, swapAddress, "");
-
         swap.fixedEnter(msg.sender, swapId);
+
+        whittToken.mint(msg.sender, swapId, swapAddress, "");
 
         emit Swap(fixedEnterType, swapId, msg.sender, _lockedAmount, _lockedDuration, _dealValue);
     }
@@ -62,9 +62,9 @@ contract WhittRDaiSwapFactory {
         // Transfer fixed deal value to owner of collateral, then enter float side
         require(dai.transferFrom(msg.sender, whittToken.ownerOf(_fixedSwapId), _dealValue), "Transfer failure");
 
-        whittToken.mint(msg.sender, floatSwapId, swapAddress, "");
-
         WhittRDaiMoney(swapAddress).floatEnter(msg.sender, floatSwapId, _fixedSwapId, _lockedAmount, _lockedDuration, _dealValue);
+
+        whittToken.mint(msg.sender, floatSwapId, swapAddress, "");
 
         emit Swap(floatEnterType, _fixedSwapId, msg.sender, _lockedAmount, _lockedDuration, _dealValue);
     }

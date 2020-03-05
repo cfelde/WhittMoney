@@ -3,9 +3,9 @@ pragma solidity ^0.5.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract IWhittRDaiMoneyToken is IERC721 {
-    function swapIdAddress(uint _swapId) public view returns (address);
-
     function setFactory(address _factoryAddress, bool _active) external;
+
+    function swapIdAddress(uint _swapId) public view returns (address);
 
     function isFixedSide(uint _swapId) public pure returns (bool);
 

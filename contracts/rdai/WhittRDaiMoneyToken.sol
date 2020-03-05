@@ -12,16 +12,16 @@ contract WhittRDaiMoneyToken is ERC721Full, IWhittRDaiMoneyToken {
         factoryAddressStatusMapping[_swapFactory] = true;
     }
 
-    function swapIdAddress(uint _swapId) public view returns (address) {
-        require(_swapId > 0 && swapIdAddressMapping[_swapId] != address(0), "Invalid swap id");
-        return swapIdAddressMapping[_swapId];
-    }
-
     function setFactory(address _factoryAddress, bool _active) external {
         require(msg.sender != _factoryAddress, "Invalid self call");
         require(factoryAddressStatusMapping[msg.sender], "Not active factory");
 
         factoryAddressStatusMapping[_factoryAddress] = _active;
+    }
+
+    function swapIdAddress(uint _swapId) public view returns (address) {
+        require(_swapId > 0 && swapIdAddressMapping[_swapId] != address(0), "Invalid swap id");
+        return swapIdAddressMapping[_swapId];
     }
 
     function isFixedSide(uint _swapId) public pure returns (bool) {
