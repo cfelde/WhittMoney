@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "../RTokenLike.sol";
+import "../rdai/RTokenLike.sol";
 
 contract FakeRToken is RTokenLike {
     event MintDebug(uint256 amount);

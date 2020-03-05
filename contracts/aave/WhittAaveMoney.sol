@@ -1,16 +1,24 @@
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./RTokenLike.sol";
+import "./ATokenLike.sol";
+import "./LendingPoolLike.sol";
 
 // Contract represents an interest rate swap between floating and fixed rates,
 // using the whitt.money protocol. See https://whitt.money for more details.
 
 // Contract created during the ETHLondon 2020 hackathon..
 
-contract WhittRDaiMoney {
+// This contract is a proof of concept using Aave rather than rDAI.
+// While WhittRDaiMoney has been deployed and tested on Kovan, WhittAaveMoney
+// is missing a bit of setup and similar. It should however not be a big
+// effort to complete this and thereby be able to enjoy aDAI on Whitt.
+// You can run local tests on this contract, with tests in whittAaveMoney.js.
+
+contract WhittAaveMoney {
     IERC20 public dai;
-    RTokenLike public rtoken;
+    LendingPoolLike public lendingPool;
+    ATokenLike public atoken;
 
     address public fixedOwner;
     address public floatOwner;
@@ -25,14 +33,16 @@ contract WhittRDaiMoney {
     // They also include the deal value, which is how much DAI they want to receive for
     // lending out the collateral.
 
-    constructor(address _dai, address _rtoken, uint _lockedAmount, uint _lockedDuration, uint _dealValue) public {
+    constructor(address _dai, address _lendingPool, address _atoken, uint _lockedAmount, uint _lockedDuration, uint _dealValue) public {
         require(_dai != address(0), "Invalid dai");
-        require(_rtoken != address(0), "Invalid rtoken");
+        require(_lendingPool != address(0), "Invalid lending pool");
+        require(_atoken != address(0), "Invalid atoken");
         require(_lockedAmount > 0, "Zero locked amount");
         require(_dealValue > 0, "Zero deal value");
 
         dai = IERC20(_dai);
-        rtoken = RTokenLike(_rtoken);
+        lendingPool = LendingPoolLike(_lendingPool);
+        atoken = ATokenLike(_atoken);
         fixedOwner = msg.sender;
         lockedAmount = _lockedAmount;
         lockedDuration = _lockedDuration;
@@ -50,15 +60,10 @@ contract WhittRDaiMoney {
     }
 
     function init() external onlyFixedGuy {
-        address[] memory recipients = new address[](1);
-        recipients[0] = msg.sender;
-
-        uint32[] memory proportions = new uint32[](1);
-        proportions[0] = uint32(1);
-
-        dai.approve(address(rtoken), uint(-1));
+        dai.approve(address(atoken), uint(-1));
         require(dai.transferFrom(msg.sender, address(this), lockedAmount), "Transfer failure");
-        require(rtoken.mintWithNewHat(lockedAmount, recipients, proportions), "RDai mint failure");
+        lendingPool.deposit(address(atoken), lockedAmount, uint16(0));
+        atoken.redirectInterestStream(msg.sender);
 
         emit NewWhitt(fixedOwner, lockedAmount, lockedDuration, dealValue);
     }
@@ -75,7 +80,8 @@ contract WhittRDaiMoney {
         lockedAmount = 0;
 
         payInterestInternal();
-        require(rtoken.redeemAndTransferAll(msg.sender), "RDai redeem failure");
+        atoken.redeem(_lockedAmount);
+        dai.transfer(msg.sender, _lockedAmount);
 
         emit FixedExit(fixedOwner, floatOwner, _lockedAmount, dealValue);
     }
@@ -92,14 +98,8 @@ contract WhittRDaiMoney {
         floatOwner = msg.sender;
         lockedTimestamp = now + lockedDuration;
 
-        address[] memory recipients = new address[](1);
-        recipients[0] = msg.sender;
-
-        uint32[] memory proportions = new uint32[](1);
-        proportions[0] = uint32(1);
-
         payInterestInternal();
-        rtoken.createHat(recipients, proportions, true);
+        atoken.redirectInterestStream(msg.sender);
 
         emit FloatEnter(fixedOwner, floatOwner, lockedAmount, dealValue);
     }
@@ -109,10 +109,6 @@ contract WhittRDaiMoney {
     }
 
     function payInterestInternal() internal {
-        rtoken.payInterest(fixedOwner);
-        if (floatOwner != address(0)) {
-            rtoken.payInterest(floatOwner);
-        }
     }
 
     event NewWhitt(address indexed fixedOwner, uint lockedAmount, uint lockedDuration, uint dealValue);

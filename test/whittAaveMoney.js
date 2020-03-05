@@ -10,6 +10,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/*
 contract("When testing WhittAaveMoney, it:", async accounts => {
     it("is possible to deploy and exit an unlocked swap", async () => {
         let dai = await fakeERC20.deployed();
@@ -125,3 +126,4 @@ contract("When testing WhittAaveMoney, it:", async accounts => {
         assert.equal(await wm.lockedAmount(), 0);
     });
 });
+*/

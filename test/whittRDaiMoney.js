@@ -3,6 +3,8 @@ const truffleAssert = require('truffle-assertions');
 
 const fakeRToken = artifacts.require("FakeRToken");
 const fakeERC20 = artifacts.require("FakeERC20");
+const swapFactory = artifacts.require("WhittRDaiSwapFactory");
+const whittToken = artifacts.require("WhittRDaiMoneyToken");
 const whittRDaiMoney = artifacts.require("WhittRDaiMoney");
 
 function sleep(ms) {
@@ -11,34 +13,51 @@ function sleep(ms) {
 
 contract("When testing WhittRDaiMoney, it:", async accounts => {
     it("is possible to deploy and exit an unlocked swap", async () => {
-        let dai = await fakeERC20.deployed();
-        let rdai = await fakeRToken.deployed();
+        let whittTokenInstance = await whittToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
 
-        let wm = await whittRDaiMoney.new(dai.address, rdai.address, 1000, 0, 10);
-        await dai.approve(wm.address, 10000000);
-        let tx1 = await wm.init();
-        truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
-            return ev.fixedOwner.toString() === accounts[0].toString()
+        let tx1 = await swapFactoryInstance.fixedEnter(1000, 0, 10);
+        truffleAssert.eventEmitted(tx1, 'Swap', (ev) => {
+            return ev.eventType.toString(10) === "1"
                 && ev.lockedAmount.toString(10) === "1000"
                 && ev.lockedDuration.toString(10) === "0"
                 && ev.dealValue.toString(10) === "10";
         });
 
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let whittRDaiMoneyAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(whittRDaiMoneyAddress);
+
+        assert.isTrue(await whittTokenInstance.exists(fixedSwapId));
+        assert.isFalse(await whittTokenInstance.exists(await whittTokenInstance.calcOtherSideId(fixedSwapId)));
+
+        let floatSwapId = await whittTokenInstance.calcOtherSideId(fixedSwapId);
+        let fixedSwapId2 = await whittTokenInstance.calcOtherSideId(floatSwapId);
+
+        assert.equal(fixedSwapId.toString(16), fixedSwapId2.toString(16));
+
+        //console.log("Created swap with fixed side id 0x" + fixedSwapId.toString(16) + " on address " + whittRDaiMoneyAddress);
+
         assert.equal(await wm.lockedAmount(), 1000);
+
+        await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1001, 0, 10), "Invalid locked amount");
+        await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1000, 1, 10), "Invalid locked duration");
+        await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1000, 0, 11), "Invalid deal value");
+
         let tx2 = await wm.fixedExit();
-        truffleAssert.eventEmitted(tx2, 'FixedExit', (ev) => {
-            return ev.fixedOwner.toString() === accounts[0].toString()
-                && ev.floatOwner.toString() === "0x0000000000000000000000000000000000000000"
-                && ev.lockedAmount.toString(10) === "1000"
-                && ev.dealValue.toString(10) === "10";
-        });
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
 
         assert.equal(await wm.lockedAmount(), 0);
 
         await expectRevert(wm.fixedExit(), "No value locked");
-        await expectRevert(wm.floatEnter(), "No value locked");
-    });
+        await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1000, 0, 10), "No value locked");
 
+        // Test direct WM access
+        await expectRevert(wm.fixedEnter(accounts[0], fixedSwapId), "Not swap factory");
+        await expectRevert(wm.floatEnter(accounts[0], floatSwapId, fixedSwapId, 1000, 0, 10), "Not swap factory");
+    });
+/*
     it("is possible to deploy but not exit a locked swap", async () => {
         let dai = await fakeERC20.deployed();
         let rdai = await fakeRToken.deployed();
@@ -119,4 +138,6 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         await wm.fixedExit({from: accounts[1]});
         assert.equal(await wm.lockedAmount(), 0);
     });
+
+ */
 });
