@@ -24,14 +24,6 @@ contract WhittRDaiMoneyToken is ERC721Full, IWhittRDaiMoneyToken {
         return swapIdAddressMapping[_swapId];
     }
 
-    function isFixedSide(uint _swapId) public pure returns (bool) {
-        return _swapId >= uint(1) * 2 ** 255;
-    }
-
-    function calcOtherSideId(uint _swapId) public pure returns (uint) {
-        return ~_swapId;
-    }
-
     function mint(address _owner, uint _swapId, address _swapAddress, bytes calldata _data) external {
         require(factoryAddressStatusMapping[msg.sender], "Not active factory");
         require(swapIdAddressMapping[_swapId] == address(0), "Not correct swap");

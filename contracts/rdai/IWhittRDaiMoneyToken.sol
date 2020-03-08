@@ -7,10 +7,6 @@ contract IWhittRDaiMoneyToken is IERC721 {
 
     function swapIdAddress(uint _swapId) public view returns (address);
 
-    function isFixedSide(uint _swapId) public pure returns (bool);
-
-    function calcOtherSideId(uint _swapId) public pure returns (uint);
-
     function mint(address _owner, uint _swapId, address _swapAddress, bytes calldata _data) external;
 
     function burn(address _owner, uint _swapId, address _swapAddress) external;

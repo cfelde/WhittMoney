@@ -36,6 +36,14 @@ contract WhittRDaiSwapFactory {
         whittToken.setFactory(_nextFactory, _active);
     }
 
+    function isFixedSide(uint _swapId) public pure returns (bool) {
+        return _swapId >= uint(1) * 2 ** 255;
+    }
+
+    function calcOtherSideId(uint _swapId) public pure returns (uint) {
+        return ~_swapId;
+    }
+
     function fixedEnter(uint _lockedAmount, uint _lockedDuration, uint _dealValue) external returns (uint swapId, address swapAddress) {
         WhittRDaiMoney swap = new WhittRDaiMoney(address(whittToken), address(this), address(dai), address(rtoken), _lockedAmount, _lockedDuration, _dealValue);
         swapAddress = address(swap);
