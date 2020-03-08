@@ -81,8 +81,6 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         let whittRDaiMoneyAddress1 = await whittTokenInstance.swapIdAddress(fixedSwapId);
         let wm = await whittRDaiMoney.at(whittRDaiMoneyAddress1);
 
-        //console.log("Created swap with fixed side id 0x" + fixedSwapId.toString(16) + " on address " + whittRDaiMoneyAddress1);
-
         assert.equal(await wm.lockedAmount(), 1000);
         // TODO Other values
 
@@ -125,8 +123,6 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         let fixedSwapId = tx1.logs[0].args.fixedSwapId;
         let floatSwapId = await swapFactoryInstance.calcOtherSideId(fixedSwapId);
 
-        //console.log("Created swap with fixed side id 0x" + fixedSwapId.toString(16) + " on address " + whittRDaiMoneyAddress1);
-
         let tx2 = await swapFactoryInstance.floatEnter(fixedSwapId, 1000, 0, 10, {from: accounts[1]});
         truffleAssert.eventEmitted(tx2, 'Swap', (ev) => {
             return ev.eventType.toString(10) === "2"
@@ -142,30 +138,27 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1000, 0, 10, {from: accounts[1]}), "Already a float guy");
     });
 
-    /*
     it("is only possible for fixed guy to exit after lockup", async () => {
-        let dai = await fakeERC20.deployed();
-        let rdai = await fakeRToken.deployed();
+        let whittTokenInstance = await whittToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
 
-        let wm = await whittRDaiMoney.new(dai.address, rdai.address, 1000000, 3, 200000, {from: accounts[1]});
-        await dai.approve(wm.address, 10000000);
-        let tx1 = await wm.init({from: accounts[1]});
-        truffleAssert.eventEmitted(tx1, 'NewWhitt', (ev) => {
-            return ev.fixedOwner.toString() === accounts[1].toString()
-                && ev.lockedAmount.toString(10) === "1000000"
-                && ev.lockedDuration.toString(10) === "3"
-                && ev.dealValue.toString(10) === "200000";
-        });
+        let tx1 = await swapFactoryInstance.fixedEnter(1000, 5, 10);
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let whittRDaiMoneyAddress1 = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(whittRDaiMoneyAddress1);
 
-        await wm.floatEnter();
+        await swapFactoryInstance.floatEnter(fixedSwapId, 1000, 5, 10, {from: accounts[1]});
 
-        await expectRevert(wm.fixedExit({from: accounts[1]}), "Locked");
+        await sleep(2000);
+        await expectRevert(wm.fixedExit(), "Locked");
+        assert.equal(await wm.lockedAmount(), 1000);
 
-        await sleep(4 * 1000);
+        await sleep(2000);
+        await expectRevert(wm.fixedExit(), "Locked");
+        assert.equal(await wm.lockedAmount(), 1000);
 
-        assert.equal(await wm.lockedAmount(), 1000000);
-        await wm.fixedExit({from: accounts[1]});
+        await sleep(2000);
+        await wm.fixedExit();
         assert.equal(await wm.lockedAmount(), 0);
     });
-    */
 });
