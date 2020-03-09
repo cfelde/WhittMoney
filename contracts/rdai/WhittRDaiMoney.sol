@@ -8,8 +8,6 @@ import "./WhittRDaiSwapFactory.sol";
 // Contract represents an interest rate swap between floating and fixed rates,
 // using the whitt.money protocol. See https://whitt.money for more details.
 
-// Contract created during the ETHLondon 2020 hackathon..
-
 contract WhittRDaiMoney {
     IWhittRDaiMoneyToken public whittToken;
     WhittRDaiSwapFactory public swapFactory;
@@ -27,7 +25,7 @@ contract WhittRDaiMoney {
     // The contract is created by the person wanting the fixed interest payments.
     // They would call the constructor including the amount to lock up and for how long.
     // They also include the deal value, which is how much DAI they want to receive for
-    // lending out the collateral.
+    // lending out the collateral. Constructor must be called through the swap factory.
 
     constructor(address _whittToken, address _swapFactory, address _dai, address _rtoken, uint _lockedAmount, uint _lockedDuration, uint _dealValue) public {
         require(_whittToken != address(0), "Invalid whitt token");
@@ -63,7 +61,7 @@ contract WhittRDaiMoney {
         fixedSwapId = _fixedSwapId;
     }
 
-    // Anyone can call, via the factory, the floatEnter assuming the deal is not already locked.
+    // Anyone can call, via the swap factory, the floatEnter assuming the deal is not already locked.
     // When doing so they must provide the deal value, which is transferred to the fixed owner.
     // From that point onwards they will receive the floating interest on the collateral.
     // This remains until the collateral is withdrawn after finishing the lockup period.
@@ -115,7 +113,7 @@ contract WhittRDaiMoney {
     function fixedExit() external {
         require(whittToken.ownerOf(fixedSwapId) == msg.sender, "Not fixed guy");
 
-        require(lockedTimestamp < now || floatSwapId == 0, "Locked");
+        require(lockedTimestamp <= now || floatSwapId == 0, "Locked");
         require(lockedAmount > 0, "No value locked");
 
         uint _lockedAmount = lockedAmount;

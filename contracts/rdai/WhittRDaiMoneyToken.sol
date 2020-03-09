@@ -26,18 +26,18 @@ contract WhittRDaiMoneyToken is ERC721Full, IWhittRDaiMoneyToken {
 
     function mint(address _owner, uint _swapId, address _swapAddress, bytes calldata _data) external {
         require(factoryAddressStatusMapping[msg.sender], "Not active factory");
-        require(swapIdAddressMapping[_swapId] == address(0), "Not correct swap");
+        require(_swapId > 0 && swapIdAddressMapping[_swapId] == address(0), "Not correct swap");
 
-        _safeMint(_owner, _swapId, _data);
         swapIdAddressMapping[_swapId] = _swapAddress;
+        _safeMint(_owner, _swapId, _data);
     }
 
     function burn(address _owner, uint _swapId, address _swapAddress) external {
         require(factoryAddressStatusMapping[msg.sender], "Not active factory");
-        require(swapIdAddressMapping[_swapId] == _swapAddress, "Not correct swap");
+        require(_swapId > 0 && swapIdAddressMapping[_swapId] == _swapAddress, "Not correct swap");
 
-        _burn(_owner, _swapId);
         delete swapIdAddressMapping[_swapId];
+        _burn(_owner, _swapId);
     }
 
     function exists(uint _swapId) public view returns (bool) {
