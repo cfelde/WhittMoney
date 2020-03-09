@@ -13,6 +13,8 @@ function sleep(ms) {
 
 contract("When testing WhittRDaiMoney, it:", async accounts => {
     it("is possible to deploy and exit an unlocked swap", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let daiInstance = await fakeERC20.deployed();
         let whittTokenInstance = await whittToken.deployed();
         let swapFactoryInstance = await swapFactory.deployed();
 
@@ -42,8 +44,16 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
 
         //console.log("Created swap with fixed side id 0x" + fixedSwapId.toString(16) + " on address " + whittRDaiMoneyAddress);
 
+        assert.equal(await wm.whittToken(), whittTokenInstance.address);
+        assert.equal(await wm.swapFactory(), swapFactoryInstance.address);
+        assert.equal(await wm.dai(), daiInstance.address);
+        assert.equal(await wm.rtoken(), rtokenInstance.address);
+        assert.equal((await wm.fixedSwapId()).toString(10), fixedSwapId.toString(10));
+        assert.equal((await wm.floatSwapId()).toString(10), 0);
         assert.equal(await wm.lockedAmount(), 1000);
-        // TODO Other values
+        assert.equal(await wm.lockedDuration(), 0);
+        assert.equal(await wm.lockedTimestamp(), 0);
+        assert.equal(await wm.dealValue(), 10);
 
         await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1001, 0, 10), "Invalid locked amount");
         await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1000, 1, 10), "Invalid locked duration");
@@ -53,8 +63,16 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         assert.isTrue(tx2.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
         assert.isTrue(tx2.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
 
+        assert.equal(await wm.whittToken(), whittTokenInstance.address);
+        assert.equal(await wm.swapFactory(), swapFactoryInstance.address);
+        assert.equal(await wm.dai(), daiInstance.address);
+        assert.equal(await wm.rtoken(), rtokenInstance.address);
+        assert.equal((await wm.fixedSwapId()).toString(10), fixedSwapId.toString(10));
+        assert.equal((await wm.floatSwapId()).toString(10), 0);
         assert.equal(await wm.lockedAmount(), 0);
-        // TODO Other values
+        assert.equal(await wm.lockedDuration(), 0);
+        assert.equal(await wm.lockedTimestamp(), 0);
+        assert.equal(await wm.dealValue(), 10);
 
         await expectRevert(wm.fixedExit(), "No value locked");
         await expectRevert(swapFactoryInstance.floatEnter(fixedSwapId, 1000, 0, 10), "No value locked");
@@ -65,24 +83,34 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
     });
 
     it("is possible to deploy but not exit a locked swap", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let daiInstance = await fakeERC20.deployed();
         let whittTokenInstance = await whittToken.deployed();
         let swapFactoryInstance = await swapFactory.deployed();
 
-        let tx1 = await swapFactoryInstance.fixedEnter(1000, 5, 10);
+        let tx1 = await swapFactoryInstance.fixedEnter(2000, 5, 20);
         truffleAssert.eventEmitted(tx1, 'Swap', (ev) => {
             return ev.eventType.toString(10) === "1"
                 && ev.actor === accounts[0]
-                && ev.lockedAmount.toString(10) === "1000"
+                && ev.lockedAmount.toString(10) === "2000"
                 && ev.lockedDuration.toString(10) === "5"
-                && ev.dealValue.toString(10) === "10";
+                && ev.dealValue.toString(10) === "20";
         });
 
         let fixedSwapId = tx1.logs[0].args.fixedSwapId;
         let whittRDaiMoneyAddress1 = await whittTokenInstance.swapIdAddress(fixedSwapId);
         let wm = await whittRDaiMoney.at(whittRDaiMoneyAddress1);
 
-        assert.equal(await wm.lockedAmount(), 1000);
-        // TODO Other values
+        assert.equal(await wm.whittToken(), whittTokenInstance.address);
+        assert.equal(await wm.swapFactory(), swapFactoryInstance.address);
+        assert.equal(await wm.dai(), daiInstance.address);
+        assert.equal(await wm.rtoken(), rtokenInstance.address);
+        assert.equal((await wm.fixedSwapId()).toString(10), fixedSwapId.toString(10));
+        assert.equal((await wm.floatSwapId()).toString(10), 0);
+        assert.equal(await wm.lockedAmount(), 2000);
+        assert.equal(await wm.lockedDuration(), 5);
+        assert.equal(await wm.lockedTimestamp(), 0);
+        assert.equal(await wm.dealValue(), 20);
 
         let floatSwapId = await swapFactoryInstance.calcOtherSideId(fixedSwapId);
 
@@ -92,13 +120,13 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         assert.isTrue(await swapFactoryInstance.isFixedSide(fixedSwapId));
         assert.isFalse(await swapFactoryInstance.isFixedSide(floatSwapId));
 
-        let tx2 = await swapFactoryInstance.floatEnter(fixedSwapId, 1000, 5, 10, {from: accounts[1]});
+        let tx2 = await swapFactoryInstance.floatEnter(fixedSwapId, 2000, 5, 20, {from: accounts[1]});
         truffleAssert.eventEmitted(tx2, 'Swap', (ev) => {
             return ev.eventType.toString(10) === "2"
                 && ev.actor === accounts[1]
-                && ev.lockedAmount.toString(10) === "1000"
+                && ev.lockedAmount.toString(10) === "2000"
                 && ev.lockedDuration.toString(10) === "5"
-                && ev.dealValue.toString(10) === "10";
+                && ev.dealValue.toString(10) === "20";
         });
 
         assert.isTrue(await whittTokenInstance.exists(floatSwapId));
@@ -107,8 +135,16 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
 
         assert.equal(whittRDaiMoneyAddress1, whittRDaiMoneyAddress2);
 
-        assert.equal(await wm.lockedAmount(), 1000);
-        // TODO Other values
+        assert.equal(await wm.whittToken(), whittTokenInstance.address);
+        assert.equal(await wm.swapFactory(), swapFactoryInstance.address);
+        assert.equal(await wm.dai(), daiInstance.address);
+        assert.equal(await wm.rtoken(), rtokenInstance.address);
+        assert.equal((await wm.fixedSwapId()).toString(10), fixedSwapId.toString(10));
+        assert.equal((await wm.floatSwapId()).toString(10), floatSwapId.toString(10));
+        assert.equal(await wm.lockedAmount(), 2000);
+        assert.equal(await wm.lockedDuration(), 5);
+        assert.isTrue(await wm.lockedTimestamp() > Math.round(new Date().getTime() / 1000));
+        assert.equal(await wm.dealValue(), 20);
 
         await sleep(2000);
 
@@ -153,12 +189,17 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         await expectRevert(wm.fixedExit(), "Locked");
         assert.equal(await wm.lockedAmount(), 1000);
 
-        await sleep(2000);
+        await sleep(1000);
         await expectRevert(wm.fixedExit(), "Locked");
         assert.equal(await wm.lockedAmount(), 1000);
 
-        await sleep(2000);
+        await sleep(3000);
         await wm.fixedExit();
         assert.equal(await wm.lockedAmount(), 0);
     });
+
+    // TODO it("is not possible to enter a float side with mismatching values", async () => {});
+
+    // TODO it("triggers the right actions in dai and rdai", async () => {});
+
 });
