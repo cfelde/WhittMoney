@@ -3,10 +3,12 @@ pragma solidity ^0.5.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract FakeERC20 is IERC20 {
-    event TransferFromDebug(address sender, address recipient, uint256 amount);
+    address public approveSpender;
+    uint256 public approveAmount;
 
-    uint256 public approval;
-    address public approvedSpender;
+    address public transferFromSender;
+    address public transferFromRecipient;
+    uint public transferFromAmount;
 
     uint8 public decimals = 18;
 
@@ -29,13 +31,15 @@ contract FakeERC20 is IERC20 {
     }
 
     function approve(address spender, uint256 amount) external returns (bool) {
-        approvedSpender = spender;
-        approval = amount;
+        approveSpender = spender;
+        approveAmount = amount;
         return true;
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
-        emit TransferFromDebug(sender, recipient, amount);
+        transferFromSender = sender;
+        transferFromRecipient = recipient;
+        transferFromAmount = amount;
         return true;
     }
 }

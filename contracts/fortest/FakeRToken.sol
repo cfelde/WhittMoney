@@ -3,13 +3,15 @@ pragma solidity ^0.5.0;
 import "../rdai/RTokenLike.sol";
 
 contract FakeRToken is RTokenLike {
-    event MintDebug(uint256 amount);
+    uint256 public mintWithNewHatAmount;
+    address[] public mintWithNewHatRecipients;
+    uint32[] public mintWithNewHatProportions;
 
-    event RedeemAndTransferDebug(address redeemTo, uint256 redeemTokens);
+    address public redeemAndTransferAllRedeemTo;
 
-    event CreateHatDebug(address[] recipients,
-        uint32[] proportions,
-        bool doChangeHat);
+    address[] public createHatRecipients;
+    uint32[] public createHatProportions;
+    bool public createHatDoChangeHat;
 
     constructor() public {}
 
@@ -37,8 +39,7 @@ contract FakeRToken is RTokenLike {
         return true;
     }
 
-    function mint(uint256 amount) external returns (bool) {
-        emit MintDebug(amount);
+    function mint(uint256) external returns (bool) {
         return true;
     }
 
@@ -47,10 +48,13 @@ contract FakeRToken is RTokenLike {
     }
 
     function mintWithNewHat(
-        uint256,
-        address[] calldata,
-        uint32[] calldata
+        uint256 amount,
+        address[] calldata recipients,
+        uint32[] calldata proportions
     ) external returns (bool) {
+        mintWithNewHatAmount = amount;
+        mintWithNewHatRecipients = recipients;
+        mintWithNewHatProportions = proportions;
         return true;
     }
 
@@ -70,12 +74,12 @@ contract FakeRToken is RTokenLike {
         return true;
     }
 
-    function redeemAndTransfer(address redeemTo, uint256 redeemTokens) external returns (bool) {
-        emit RedeemAndTransferDebug(redeemTo, redeemTokens);
+    function redeemAndTransfer(address, uint256) external returns (bool) {
         return true;
     }
 
-    function redeemAndTransferAll(address) external returns (bool) {
+    function redeemAndTransferAll(address redeemTo) external returns (bool) {
+        redeemAndTransferAllRedeemTo = redeemTo;
         return true;
     }
 
@@ -84,7 +88,9 @@ contract FakeRToken is RTokenLike {
         uint32[] calldata proportions,
         bool doChangeHat
     ) external returns (uint256) {
-        emit CreateHatDebug(recipients, proportions, doChangeHat);
+        createHatRecipients = recipients;
+        createHatProportions = proportions;
+        createHatDoChangeHat = doChangeHat;
         return 0;
     }
 
