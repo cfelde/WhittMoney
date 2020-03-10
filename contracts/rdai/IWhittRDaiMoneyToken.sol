@@ -11,5 +11,7 @@ contract IWhittRDaiMoneyToken is IERC721 {
 
     function burn(address _owner, uint _swapId, address _swapAddress) external;
 
-    function exists(uint _swapId) public view returns (bool);
+    function exists(uint _swapId) external view returns (bool);
+
+    function isApprovedOrOwner(address _spender, uint _swapId) external view returns (bool);
 }

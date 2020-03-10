@@ -33,14 +33,18 @@ contract WhittRDaiMoneyToken is ERC721Full, IWhittRDaiMoneyToken {
     }
 
     function burn(address _owner, uint _swapId, address _swapAddress) external {
-        require(factoryAddressStatusMapping[msg.sender], "Not active factory");
+        require(factoryAddressStatusMapping[msg.sender] || _swapAddress == msg.sender, "Not active factory");
         require(_swapId > 0 && swapIdAddressMapping[_swapId] == _swapAddress, "Not correct swap");
 
         delete swapIdAddressMapping[_swapId];
         _burn(_owner, _swapId);
     }
 
-    function exists(uint _swapId) public view returns (bool) {
+    function exists(uint _swapId) external view returns (bool) {
         return _exists(_swapId);
+    }
+
+    function isApprovedOrOwner(address _spender, uint _swapId) external view returns (bool) {
+        return _isApprovedOrOwner(_spender, _swapId);
     }
 }
