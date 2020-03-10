@@ -364,7 +364,154 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[1]);
     });
 
-    // TODO it("is possible to change swap leg owners", async () => {});
+    it("is possible to change swap leg owners", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
+        let whittTokenInstance = await whittToken.deployed();
 
-    // TODO it("is possible to change swap leg spenders", async () => {});
+        let tx1 = await swapFactoryInstance.fixedEnter(1, 0, 1, {from: accounts[0]});
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let swapAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(swapAddress);
+
+        await swapFactoryInstance.floatEnter(fixedSwapId, 1, 0, 1, {from: accounts[1]});
+
+        let floatSwapId = await swapFactoryInstance.calcOtherSideId(fixedSwapId);
+
+        assert.equal(await whittTokenInstance.ownerOf(fixedSwapId), accounts[0]);
+        assert.equal(await whittTokenInstance.ownerOf(floatSwapId), accounts[1]);
+
+        await expectRevert(whittTokenInstance.transferFrom(accounts[0], accounts[2], fixedSwapId, {from: accounts[2]}), "ERC721: transfer caller is not owner nor approved");
+        await expectRevert(whittTokenInstance.transferFrom(accounts[1], accounts[3], floatSwapId, {from: accounts[3]}), "ERC721: transfer caller is not owner nor approved");
+        await whittTokenInstance.transferFrom(accounts[0], accounts[2], fixedSwapId, {from: accounts[0]});
+        await whittTokenInstance.transferFrom(accounts[1], accounts[3], floatSwapId, {from: accounts[1]});
+
+        assert.equal(await whittTokenInstance.ownerOf(fixedSwapId), accounts[2]);
+        assert.equal(await whittTokenInstance.ownerOf(floatSwapId), accounts[3]);
+
+        await expectRevert(wm.updateFloatReceiver(accounts[8], {from: accounts[1]}), "Not float guy");
+
+        let tx2 = await wm.updateFloatReceiver(accounts[8], {from: accounts[3]});
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
+
+        assert.equal(await rtokenInstance.createHatRecipients(0), accounts[8]);
+        assert.equal(await rtokenInstance.createHatProportions(0), 1);
+        await expectRevert(rtokenInstance.createHatRecipients(1), "invalid opcode");
+        await expectRevert(rtokenInstance.createHatProportions(1), "invalid opcode");
+        assert.isTrue(await rtokenInstance.createHatDoChangeHat());
+
+        await expectRevert(wm.fixedExit({from: accounts[0]}), "Not fixed guy");
+
+        await wm.fixedExit({from: accounts[2]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[8]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[2]);
+    });
+
+    it("is possible to change swap leg spenders, on specific id", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
+        let whittTokenInstance = await whittToken.deployed();
+
+        let tx1 = await swapFactoryInstance.fixedEnter(1, 0, 1, {from: accounts[0]});
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let swapAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(swapAddress);
+
+        await swapFactoryInstance.floatEnter(fixedSwapId, 1, 0, 1, {from: accounts[1]});
+
+        let floatSwapId = await swapFactoryInstance.calcOtherSideId(fixedSwapId);
+
+        assert.equal(await whittTokenInstance.ownerOf(fixedSwapId), accounts[0]);
+        assert.equal(await whittTokenInstance.ownerOf(floatSwapId), accounts[1]);
+
+        await expectRevert(whittTokenInstance.approve(accounts[2], fixedSwapId, {from: accounts[2]}), "ERC721: approve caller is not owner nor approved for all");
+        await expectRevert(whittTokenInstance.approve(accounts[3], floatSwapId, {from: accounts[3]}), "ERC721: approve caller is not owner nor approved for all");
+        await whittTokenInstance.approve(accounts[2], fixedSwapId, {from: accounts[0]});
+        await whittTokenInstance.approve(accounts[3], floatSwapId, {from: accounts[1]});
+
+        assert.equal(await whittTokenInstance.ownerOf(fixedSwapId), accounts[0]);
+        assert.equal(await whittTokenInstance.ownerOf(floatSwapId), accounts[1]);
+        assert.equal(await whittTokenInstance.getApproved(fixedSwapId), accounts[2]);
+        assert.equal(await whittTokenInstance.getApproved(floatSwapId), accounts[3]);
+
+        let tx2 = await wm.updateFloatReceiver(accounts[7], {from: accounts[1]});
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
+
+        assert.equal(await rtokenInstance.createHatRecipients(0), accounts[7]);
+        assert.equal(await rtokenInstance.createHatProportions(0), 1);
+        await expectRevert(rtokenInstance.createHatRecipients(1), "invalid opcode");
+        await expectRevert(rtokenInstance.createHatProportions(1), "invalid opcode");
+        assert.isTrue(await rtokenInstance.createHatDoChangeHat());
+
+        let tx3 = await wm.updateFloatReceiver(accounts[8], {from: accounts[3]});
+        assert.isTrue(tx3.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx3.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
+
+        assert.equal(await rtokenInstance.createHatRecipients(0), accounts[8]);
+        assert.equal(await rtokenInstance.createHatProportions(0), 1);
+        await expectRevert(rtokenInstance.createHatRecipients(1), "invalid opcode");
+        await expectRevert(rtokenInstance.createHatProportions(1), "invalid opcode");
+        assert.isTrue(await rtokenInstance.createHatDoChangeHat());
+
+        await wm.fixedExit({from: accounts[2]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[8]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[0]);
+    });
+
+    it("is possible to change swap leg spenders, on all ids", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
+        let whittTokenInstance = await whittToken.deployed();
+
+        let tx1 = await swapFactoryInstance.fixedEnter(1, 0, 1, {from: accounts[0]});
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let swapAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(swapAddress);
+
+        await swapFactoryInstance.floatEnter(fixedSwapId, 1, 0, 1, {from: accounts[1]});
+
+        let floatSwapId = await swapFactoryInstance.calcOtherSideId(fixedSwapId);
+
+        assert.equal(await whittTokenInstance.ownerOf(fixedSwapId), accounts[0]);
+        assert.equal(await whittTokenInstance.ownerOf(floatSwapId), accounts[1]);
+
+        await expectRevert(whittTokenInstance.setApprovalForAll(accounts[2], true, {from: accounts[2]}), "ERC721: approve to caller");
+        await expectRevert(whittTokenInstance.setApprovalForAll(accounts[3], true, {from: accounts[3]}), "ERC721: approve to caller");
+        await whittTokenInstance.setApprovalForAll(accounts[2], true, {from: accounts[0]});
+        await whittTokenInstance.setApprovalForAll(accounts[3], true, {from: accounts[1]});
+
+        assert.equal(await whittTokenInstance.ownerOf(fixedSwapId), accounts[0]);
+        assert.equal(await whittTokenInstance.ownerOf(floatSwapId), accounts[1]);
+        assert.isTrue(await whittTokenInstance.isApprovedForAll(accounts[0], accounts[2]));
+        assert.isTrue(await whittTokenInstance.isApprovedForAll(accounts[1], accounts[3]));
+
+        let tx2 = await wm.updateFloatReceiver(accounts[7], {from: accounts[1]});
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
+
+        assert.equal(await rtokenInstance.createHatRecipients(0), accounts[7]);
+        assert.equal(await rtokenInstance.createHatProportions(0), 1);
+        await expectRevert(rtokenInstance.createHatRecipients(1), "invalid opcode");
+        await expectRevert(rtokenInstance.createHatProportions(1), "invalid opcode");
+        assert.isTrue(await rtokenInstance.createHatDoChangeHat());
+
+        let tx3 = await wm.updateFloatReceiver(accounts[8], {from: accounts[3]});
+        assert.isTrue(tx3.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx3.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
+
+        assert.equal(await rtokenInstance.createHatRecipients(0), accounts[8]);
+        assert.equal(await rtokenInstance.createHatProportions(0), 1);
+        await expectRevert(rtokenInstance.createHatRecipients(1), "invalid opcode");
+        await expectRevert(rtokenInstance.createHatProportions(1), "invalid opcode");
+        assert.isTrue(await rtokenInstance.createHatDoChangeHat());
+
+        await wm.fixedExit({from: accounts[2]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[8]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[0]);
+    });
 });
