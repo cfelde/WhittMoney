@@ -294,7 +294,45 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         assert.equal(await rtokenInstance.redeemAndTransferAllRedeemTo(), accounts[3]);
     });
 
-    // TODO it("is possible to pay interest", async () => {});
+    it("is possible to pay interest, only one side", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
+        let whittTokenInstance = await whittToken.deployed();
+
+        let tx1 = await swapFactoryInstance.fixedEnter(3000, 3, 30, {from: accounts[3]});
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let swapAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(swapAddress);
+
+        let existingValue = await rtokenInstance.payInterestRecipient1();
+        assert.notEqual(existingValue, accounts[3]);
+
+        await wm.fixedExit({from: accounts[3]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[3]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), existingValue);
+    });
+
+    it("is possible to pay interest, both sides", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
+        let whittTokenInstance = await whittToken.deployed();
+
+        let tx1 = await swapFactoryInstance.fixedEnter(1, 0, 1, {from: accounts[5]});
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let swapAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(swapAddress);
+
+        await swapFactoryInstance.floatEnter(fixedSwapId, 1, 0, 1, {from: accounts[4]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[5]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[3]); // From previous test
+
+        await wm.fixedExit({from: accounts[5]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[4]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[5]);
+    });
 
     // TODO it("is possible to change swap leg owners and update float receiver", async () => {});
 

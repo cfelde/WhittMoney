@@ -13,6 +13,9 @@ contract FakeRToken is RTokenLike {
     uint32[] public createHatProportions;
     bool public createHatDoChangeHat;
 
+    address public payInterestRecipient1;
+    address public payInterestRecipient2;
+
     constructor() public {}
 
     function totalSupply() external view returns (uint256) {
@@ -98,7 +101,9 @@ contract FakeRToken is RTokenLike {
         return true;
     }
 
-    function payInterest(address) external returns (bool) {
+    function payInterest(address recipient) external returns (bool) {
+        payInterestRecipient2 = payInterestRecipient1;
+        payInterestRecipient1 = recipient;
         return true;
     }
 
