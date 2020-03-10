@@ -52,7 +52,7 @@ contract WhittRDaiSwapFactory {
         // Transfer collateral from initiator to contract, then enter fixed side
         require(dai.transferFrom(msg.sender, swapAddress, _lockedAmount), "Transfer failure");
 
-        swap.fixedEnter(msg.sender, swapId);
+        swap.fixedEnter(swapId, msg.sender);
 
         whittToken.mint(msg.sender, swapId, swapAddress, "");
 
@@ -60,6 +60,14 @@ contract WhittRDaiSwapFactory {
     }
 
     function floatEnter(uint _fixedSwapId, uint _lockedAmount, uint _lockedDuration, uint _dealValue) external returns (uint floatSwapId, address swapAddress) {
+        return floatEnterInternal(_fixedSwapId, _lockedAmount, _lockedDuration, _dealValue, msg.sender);
+    }
+
+    function floatEnterWithReceiver(uint _fixedSwapId, uint _lockedAmount, uint _lockedDuration, uint _dealValue, address _floatReceiver) external returns (uint floatSwapId, address swapAddress) {
+        return floatEnterInternal(_fixedSwapId, _lockedAmount, _lockedDuration, _dealValue, _floatReceiver);
+    }
+
+    function floatEnterInternal(uint _fixedSwapId, uint _lockedAmount, uint _lockedDuration, uint _dealValue, address _floatReceiver) internal returns (uint floatSwapId, address swapAddress) {
         require(_fixedSwapId > 0, "Invalid swap reference");
 
         floatSwapId = _fixedSwapId ^ uint(-1);
@@ -70,7 +78,7 @@ contract WhittRDaiSwapFactory {
         // Transfer fixed deal value to owner of collateral, then enter float side
         require(dai.transferFrom(msg.sender, whittToken.ownerOf(_fixedSwapId), _dealValue), "Transfer failure");
 
-        WhittRDaiMoney(swapAddress).floatEnter(msg.sender, floatSwapId, _fixedSwapId, _lockedAmount, _lockedDuration, _dealValue);
+        WhittRDaiMoney(swapAddress).floatEnter(floatSwapId, _fixedSwapId, _lockedAmount, _lockedDuration, _dealValue, _floatReceiver);
 
         whittToken.mint(msg.sender, floatSwapId, swapAddress, "");
 

@@ -44,11 +44,13 @@ contract WhittRDaiMoney {
         lockedDuration = _lockedDuration;
         dealValue = _dealValue;
 
-        dai.approve(address(rtoken), uint(-1));
+        require(dai.approve(address(rtoken), uint(-1)), "No DAI approval");
     }
 
-    function fixedEnter(address _owner, uint _fixedSwapId) external {
+    function fixedEnter(uint _fixedSwapId, address _owner) external {
         require(address(swapFactory) == msg.sender, "Not swap factory");
+
+        fixedSwapId = _fixedSwapId;
 
         address[] memory recipients = new address[](1);
         recipients[0] = _owner;
@@ -57,8 +59,6 @@ contract WhittRDaiMoney {
         proportions[0] = uint32(1);
 
         require(rtoken.mintWithNewHat(lockedAmount, recipients, proportions), "RDai mint failure");
-
-        fixedSwapId = _fixedSwapId;
     }
 
     // Anyone can call, via the swap factory, the floatEnter assuming the deal is not already locked.
@@ -66,7 +66,7 @@ contract WhittRDaiMoney {
     // From that point onwards they will receive the floating interest on the collateral.
     // This remains until the collateral is withdrawn after finishing the lockup period.
 
-    function floatEnter(address _owner, uint _swapId, uint _swapRef, uint _lockedAmount, uint _lockedDuration, uint _dealValue) external {
+    function floatEnter(uint _swapId, uint _swapRef, uint _lockedAmount, uint _lockedDuration, uint _dealValue, address _floatReceiver) external {
         require(address(swapFactory) == msg.sender, "Not swap factory");
         require(floatSwapId == 0, "Already a float guy");
 
@@ -80,30 +80,28 @@ contract WhittRDaiMoney {
 
         payInterestInternal();
 
-        address[] memory recipients = new address[](1);
-        recipients[0] = _owner;
-
-        uint32[] memory proportions = new uint32[](1);
-        proportions[0] = uint32(1);
-
         floatSwapId = _swapId;
 
-        rtoken.createHat(recipients, proportions, true);
+        updateFloatReceiverInternal(_floatReceiver);
     }
 
-    function updateFloatReceiver() external {
-        require(whittToken.ownerOf(floatSwapId) == msg.sender, "Not float guy");
+    function updateFloatReceiver(address _floatReceiver) external {
+        require(floatSwapId > 0 && whittToken.isApprovedOrOwner(msg.sender, floatSwapId), "Not float guy");
 
+        payInterestInternal();
+        updateFloatReceiverInternal(_floatReceiver);
+
+        swapFactory.emitFloatUpdate(fixedSwapId, lockedAmount, lockedDuration, dealValue);
+    }
+
+    function updateFloatReceiverInternal(address _floatReceiver) internal {
         address[] memory recipients = new address[](1);
-        recipients[0] = msg.sender;
+        recipients[0] = _floatReceiver;
 
         uint32[] memory proportions = new uint32[](1);
         proportions[0] = uint32(1);
 
-        payInterestInternal();
         rtoken.createHat(recipients, proportions, true);
-
-        swapFactory.emitFloatUpdate(fixedSwapId, lockedAmount, lockedDuration, dealValue);
     }
 
     // Until someone has locked in the deal the fixed side who also called the constructor
@@ -111,7 +109,7 @@ contract WhittRDaiMoney {
     // locked, they may only withdraw the collateral after the lockup period.
 
     function fixedExit() external {
-        require(whittToken.ownerOf(fixedSwapId) == msg.sender, "Not fixed guy");
+        require(fixedSwapId > 0 && whittToken.isApprovedOrOwner(msg.sender, fixedSwapId), "Not fixed guy");
 
         require(lockedTimestamp <= now || floatSwapId == 0, "Locked");
         require(lockedAmount > 0, "No value locked");
@@ -124,9 +122,19 @@ contract WhittRDaiMoney {
 
         swapFactory.emitFixedExit(fixedSwapId, _lockedAmount, lockedDuration, dealValue);
 
-        // We could burn and self destruct here if we want, but because there's maybe two sides
-        // it might be nice for the other side to still have a reference available.
+        // Burn fixed side NFT
+        whittToken.burn(whittToken.ownerOf(fixedSwapId), fixedSwapId, address(this));
+
+        // Burn float side NFT if needed
+        if (floatSwapId > 0) {
+            whittToken.burn(whittToken.ownerOf(floatSwapId), floatSwapId, address(this));
+        }
+
+        // Contract no longer needed, self destruct..
+        selfdestruct(msg.sender);
     }
+
+    // The below functions are purely utility functions interacting with rtoken
 
     function payInterest() external {
         payInterestInternal();
