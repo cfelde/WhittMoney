@@ -22,6 +22,8 @@ contract WhittRDaiMoney {
     uint public lockedTimestamp;
     uint public dealValue;
 
+    address public floatReceiver;
+
     // The contract is created by the person wanting the fixed interest payments.
     // They would call the constructor including the amount to lock up and for how long.
     // They also include the deal value, which is how much DAI they want to receive for
@@ -102,6 +104,8 @@ contract WhittRDaiMoney {
         proportions[0] = uint32(1);
 
         rtoken.createHat(recipients, proportions, true);
+
+        floatReceiver = _floatReceiver;
     }
 
     // Until someone has locked in the deal the fixed side who also called the constructor
@@ -144,13 +148,8 @@ contract WhittRDaiMoney {
         address fixedOwner = whittToken.ownerOf(fixedSwapId);
         rtoken.payInterest(fixedOwner);
 
-        if (floatSwapId == 0) {
-            return;
-        }
-
-        address floatOwner = whittToken.ownerOf(floatSwapId);
-        if (floatOwner != address(0)) {
-            rtoken.payInterest(floatOwner);
+        if (floatReceiver != address(0)) {
+            rtoken.payInterest(floatReceiver);
         }
     }
 }

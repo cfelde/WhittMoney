@@ -334,6 +334,37 @@ contract("When testing WhittRDaiMoney, it:", async accounts => {
         assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[5]);
     });
 
-    // TODO it("is possible to change swap leg owners and update float receiver", async () => {});
+    it("is possible to update float receiver", async () => {
+        let rtokenInstance = await fakeRToken.deployed();
+        let swapFactoryInstance = await swapFactory.deployed();
+        let whittTokenInstance = await whittToken.deployed();
 
+        let tx1 = await swapFactoryInstance.fixedEnter(1, 0, 1, {from: accounts[1]});
+        let fixedSwapId = tx1.logs[0].args.fixedSwapId;
+        let swapAddress = await whittTokenInstance.swapIdAddress(fixedSwapId);
+        let wm = await whittRDaiMoney.at(swapAddress);
+
+        await swapFactoryInstance.floatEnter(fixedSwapId, 1, 0, 1, {from: accounts[4]});
+
+        await expectRevert(wm.updateFloatReceiver(accounts[6]), "Not float guy");
+
+        let tx2 = await wm.updateFloatReceiver(accounts[6], {from: accounts[4]});
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.address).includes(swapFactoryInstance.address));
+        assert.isTrue(tx2.receipt.rawLogs.map(x => x.topics[0]).includes(web3.utils.keccak256("Swap(uint256,uint256,address,uint256,uint256,uint256)")));
+
+        assert.equal(await rtokenInstance.createHatRecipients(0), accounts[6]);
+        assert.equal(await rtokenInstance.createHatProportions(0), 1);
+        await expectRevert(rtokenInstance.createHatRecipients(1), "invalid opcode");
+        await expectRevert(rtokenInstance.createHatProportions(1), "invalid opcode");
+        assert.isTrue(await rtokenInstance.createHatDoChangeHat());
+
+        await wm.fixedExit({from: accounts[1]});
+
+        assert.equal(await rtokenInstance.payInterestRecipient1(), accounts[6]);
+        assert.equal(await rtokenInstance.payInterestRecipient2(), accounts[1]);
+    });
+
+    // TODO it("is possible to change swap leg owners", async () => {});
+
+    // TODO it("is possible to change swap leg spenders", async () => {});
 });
