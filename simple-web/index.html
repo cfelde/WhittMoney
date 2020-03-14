@@ -20,6 +20,10 @@
         input[type=button] {
             margin-top: 15px;
         }
+
+        select {
+            width: 455px;
+        }
     </style>
 </head>
 <body>
@@ -117,6 +121,14 @@
 
         <br/>
 
+        <label for="exit-fixed-redeem-rdai">Redeem all rDAI to DAI?</label>
+        <select id="exit-fixed-redeem-rdai" name="exit-fixed-redeem-rdai">
+            <option value="true">Yes, convert all my rDAI into DAI</option>
+            <option value="false">No, keep my rDAI as is</option>
+        </select>
+
+        <br/>
+
         <input type="button" value="Submit" onclick="exitFixedSubmit()">
     </form>
 </div>
@@ -128,6 +140,8 @@
     // TODO Temporary addresses, to be updated..
     const swapFactoryAddress = "0x149636eECb98F8564adec9a7E36b8Fc16Da9507F";
     const swapTokenAddress = "0x384779758032D01f57Adb44cD4409D4cE07040c4";
+    const daiAddress = "0xdDb4Dd12Ea6C92D09FaA4B64FE398F926be23A12";
+    const rtokenAddress = "0x96923dA433Be67C18D24C5D60B8d4A250D9AC66b";
 
     async function getProvider() {
         let web3Provider;
@@ -154,6 +168,32 @@
         }
 
         return web3Provider;
+    }
+
+    async function ensureDaiAllowance(web3Provider, web3, amount) {
+        let accounts = await web3.eth.getAccounts();
+
+        let daiJson = await (await fetch("build/contracts/IERC20.json")).json();
+        let daiContract = TruffleContract(daiJson);
+
+        daiContract.setProvider(web3Provider);
+        daiContract.defaults({
+            from: accounts[0]
+        });
+
+        let daiInstance = await daiContract.at(daiAddress);
+        console.log("Using dai contract at " + daiInstance.address);
+
+        let allowance = await daiInstance.allowance(accounts[0], swapFactoryAddress);
+        console.log("Current allowance is " + allowance.toString(10));
+
+        if (allowance.gte(amount)) {
+            return;
+        }
+
+        let newAllowance = web3.utils.toBN("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        console.log("Asking for allowance: " + newAllowance.toString(10));
+        await daiInstance.approve(swapFactoryAddress, newAllowance.toString(10));
     }
 
     async function enterFixedSubmit() {
@@ -201,7 +241,8 @@
         let swapTokenInstance = await swapTokenContract.at(swapTokenAddress);
         console.log("Using swap token contract at " + swapTokenInstance.address);
 
-        // TODO Verify that the factory can transfer our DAI..
+        // Verify that the factory can transfer our DAI..
+        await ensureDaiAllowance(web3Provider, web3, web3.utils.toBN(lockedAmount));
 
         // Execute fixed enter..
         let tx = await swapFactoryInstance.fixedEnter(lockedAmount, lockedDuration, dealValue);
@@ -269,7 +310,8 @@
         let swapTokenInstance = await swapTokenContract.at(swapTokenAddress);
         console.log("Using swap token contract at " + swapTokenInstance.address);
 
-        // TODO Verify that the factory can transfer our DAI..
+        // Verify that the factory can transfer our DAI..
+        await ensureDaiAllowance(web3Provider, web3, web3.utils.toBN(dealValue));
 
         // Execute fixed enter..
         let fixedSwapId = web3.utils.toBN("0x" + fixedSwapIdInput);
@@ -283,13 +325,69 @@
     async function updateFloatReceiverSubmit() {
         console.log("Update float receiver submit");
 
-        // TODO
+        let web3Provider = await getProvider();
+        let web3 = new Web3(web3Provider);
+        let accounts = await web3.eth.getAccounts();
+
+        let swapAddress = document.getElementById("float-receiver-swap-address").value;
+        console.log("Swap address: " + swapAddress);
+
+        let floatReceiverAddress = document.getElementById("float-receiver-receiver-address").value;
+        console.log("Float receiver address: " + floatReceiverAddress);
+
+        let swapMoneyJson = await (await fetch("build/contracts/WhittRDaiMoney.json")).json();
+        let swapMoneyContract = TruffleContract(swapMoneyJson);
+
+        swapMoneyContract.setProvider(web3Provider);
+        swapMoneyContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapMoneyInstance = await swapMoneyContract.at(swapAddress);
+
+        await swapMoneyInstance.updateFloatReceiver(floatReceiverAddress);
     }
 
     async function exitFixedSubmit() {
         console.log("Exit fixed submit");
 
-        // TODO
+        let web3Provider = await getProvider();
+        let web3 = new Web3(web3Provider);
+        let accounts = await web3.eth.getAccounts();
+
+        let swapAddress = document.getElementById("exit-fixed-swap-address").value;
+        console.log("Swap address: " + swapAddress);
+
+        let redeemRDaiInput = document.getElementById("exit-fixed-redeem-rdai").value;
+        console.log("Redeem RDai input: " + redeemRDaiInput);
+
+        let swapMoneyJson = await (await fetch("build/contracts/WhittRDaiMoney.json")).json();
+        let swapMoneyContract = TruffleContract(swapMoneyJson);
+
+        swapMoneyContract.setProvider(web3Provider);
+        swapMoneyContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapMoneyInstance = await swapMoneyContract.at(swapAddress);
+
+        await swapMoneyInstance.fixedExit();
+
+        if ("true" === redeemRDaiInput) {
+            let rTokenJson = await (await fetch("build/contracts/RTokenLike.json")).json();
+            let rTokenContract = TruffleContract(rTokenJson);
+
+            rTokenContract.setProvider(web3Provider);
+            rTokenContract.defaults({
+                from: accounts[0]
+            });
+
+            let rTokenInstance = await rTokenContract.at(rtokenAddress);
+
+            console.log("Using rtoken contract at " + rTokenInstance.address);
+
+            await rTokenInstance.redeemAll();
+        }
     }
 </script>
 
