@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple contract interface</title>
+    <style type="text/css">
+        form {
+            margin: 25px;
+        }
+
+        label {
+            min-width: 300px;
+            display: inline-block;
+        }
+
+        input[type=number], input[type=text] {
+            width: 450px;
+        }
+
+        input[type=button] {
+            margin-top: 15px;
+        }
+
+        select {
+            width: 455px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <p>
+        Note: Details printed to console when you hit "Submit". Some steps might be optional, but everything starts with "Enter fixed".
+    </p>
+
+    <hr>
+
+    <p>
+        Enter fixed
+    </p>
+    <form>
+        <label for="enter-fixed-locked-amount">Collateral to lock up, in DAI</label>
+        <input type="number" id="enter-fixed-locked-amount" name="enter-fixed-locaked-amount" min="1" value="100">
+
+        <br/>
+
+        <label for="enter-fixed-locked-duration">Swap locked duration, in seconds</label>
+        <input type="number" id="enter-fixed-locked-duration" name="enter-fixed-locked-duration" min="0" value="1">
+
+        <br/>
+
+        <label for="enter-fixed-deal-value">Deal value paid by other side, in DAI</label>
+        <input type="number" id="enter-fixed-deal-value" name="enter-fixed-deal-value" min="1" value="10">
+
+        <br/>
+
+        <input type="button" value="Submit" onclick="enterFixedSubmit()">
+    </form>
+</div>
+
+<hr>
+
+<div>
+    <p>
+        Enter float
+    </p>
+    <form>
+        <label for="enter-float-fixed-id">Swap ID of fixed side</label>
+        <input type="text" id="enter-float-fixed-id" name="enter-float-fixed-id" value="">
+
+        <br/>
+
+        <label for="enter-float-locked-amount">Collateral to lock up, in DAI</label>
+        <input type="number" id="enter-float-locked-amount" name="enter-float-locaked-amount" min="1" value="">
+
+        <br/>
+
+        <label for="enter-float-locked-duration">Swap locked duration, in seconds</label>
+        <input type="number" id="enter-float-locked-duration" name="enter-float-locked-duration" min="0" value="">
+
+        <br/>
+
+        <label for="enter-float-deal-value">Deal value paid by other side, in DAI</label>
+        <input type="number" id="enter-float-deal-value" name="enter-float-deal-value" min="1" value="">
+
+        <br/>
+
+        <input type="button" value="Submit" onclick="enterFloatSubmit()">
+    </form>
+</div>
+
+<hr>
+
+<div>
+    <p>
+        Update float receiver
+    </p>
+    <form>
+        <label for="float-receiver-swap-address">Address of swap contract</label>
+        <input type="text" id="float-receiver-swap-address" name="float-receiver-swap-address" value="">
+
+        <br/>
+
+        <label for="float-receiver-receiver-address">Address of float interest receiver</label>
+        <input type="text" id="float-receiver-receiver-address" name="float-receiver-receiver-address" value="">
+
+        <br/>
+
+        <input type="button" value="Submit" onclick="updateFloatReceiverSubmit()">
+    </form>
+</div>
+
+<hr>
+
+<div>
+    <p>
+        Exit fixed
+    </p>
+    <form>
+        <label for="exit-fixed-swap-address">Address of swap contract</label>
+        <input type="text" id="exit-fixed-swap-address" name="exit-fixed-swap-address" value="">
+
+        <br/>
+
+        <label for="exit-fixed-redeem-rdai">Redeem all rDAI to DAI?</label>
+        <select id="exit-fixed-redeem-rdai" name="exit-fixed-redeem-rdai">
+            <option value="true">Yes, convert all my rDAI into DAI</option>
+            <option value="false">No, keep my rDAI as is</option>
+        </select>
+
+        <br/>
+
+        <input type="button" value="Submit" onclick="exitFixedSubmit()">
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.2.0/dist/web3.min.js" integrity="sha256-WKLoXrA2EzbNYq3Au3vo/5iGkUiglEeuCEZ848zQ/JM=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/truffle-contract@4.0.31/dist/truffle-contract.min.js" integrity="sha256-uLnHe7f7ZoAhxxmrLwdkX1V6eB/u4+NTk6i24L1FzPs=" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+    // Kovan addresses
+    const daiAddress = "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa";
+    const rtokenAddress = "0x462303f77a3f17Dbd95eb7bab412FE4937F9B9CB";
+    const swapFactoryAddress = "0xA66e7018DF6cD67aAf08179671b2F760bC6d21Be";
+    const swapTokenAddress = "0x941Cc201017c4f31F7eD569d302A8372BAa299D5";
+
+    async function getProvider() {
+        let web3Provider;
+
+        // Modern dapp browsers...
+        if (window.ethereum) {
+            web3Provider = window.ethereum;
+
+            try {
+                // Request account access
+                await window.ethereum.enable();
+            } catch (error) {
+                // User denied account access...
+                console.error("User denied account access")
+            }
+        }
+        // Legacy dapp browsers...
+        else if (window.web3) {
+            web3Provider = window.web3.currentProvider;
+        }
+        // If no injected web3 instance is detected, return null..
+        else {
+            web3Provider = null;
+        }
+
+        return web3Provider;
+    }
+
+    async function ensureDaiAllowance(web3Provider, web3, amount) {
+        let accounts = await web3.eth.getAccounts();
+
+        let daiJson = await (await fetch("build/contracts/IERC20.json")).json();
+        let daiContract = TruffleContract(daiJson);
+
+        daiContract.setProvider(web3Provider);
+        daiContract.defaults({
+            from: accounts[0]
+        });
+
+        let daiInstance = await daiContract.at(daiAddress);
+        console.log("Using dai contract at " + daiInstance.address);
+
+        let allowance = await daiInstance.allowance(accounts[0], swapFactoryAddress);
+        console.log("Current allowance is " + allowance.toString(10));
+
+        if (allowance.gte(amount)) {
+            return;
+        }
+
+        let newAllowance = web3.utils.toBN("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        console.log("Asking for allowance: " + newAllowance.toString(10));
+        await daiInstance.approve(swapFactoryAddress, newAllowance.toString(10));
+    }
+
+    async function enterFixedSubmit() {
+        console.log("Enter fixed submit");
+
+        let web3Provider = await getProvider();
+        let web3 = new Web3(web3Provider);
+
+        let lockedAmountInput = document.getElementById("enter-fixed-locked-amount").value;
+        console.log("Collateral to lock up value: " + lockedAmountInput);
+        let lockedAmount = web3.utils.toWei(lockedAmountInput);
+        console.log("Locked amount param: " + lockedAmount);
+
+        let lockedDuration = document.getElementById("enter-fixed-locked-duration").value;
+        console.log("Locked duration param: " + lockedDuration);
+
+        let dealValueInput = document.getElementById("enter-fixed-deal-value").value;
+        console.log("Deal value: " + dealValueInput);
+        let dealValue = web3.utils.toWei(dealValueInput);
+        console.log("Deal value param: " + dealValue);
+
+        let accounts = await web3.eth.getAccounts();
+
+        // Set up swap factory contract
+        let swapFactoryJson = await (await fetch("build/contracts/WhittRDaiSwapFactory.json")).json();
+        let swapFactoryContract = TruffleContract(swapFactoryJson);
+
+        swapFactoryContract.setProvider(web3Provider);
+        swapFactoryContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapFactoryInstance = await swapFactoryContract.at(swapFactoryAddress);
+        console.log("Using swap factory contract at " + swapFactoryInstance.address);
+
+        // Set up swap NFT contract
+        let swapTokenJson = await (await fetch("build/contracts/WhittRDaiMoneyToken.json")).json();
+        let swapTokenContract = TruffleContract(swapTokenJson);
+
+        swapTokenContract.setProvider(web3Provider);
+        swapTokenContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapTokenInstance = await swapTokenContract.at(swapTokenAddress);
+        console.log("Using swap token contract at " + swapTokenInstance.address);
+
+        // Verify that the factory can transfer our DAI..
+        await ensureDaiAllowance(web3Provider, web3, web3.utils.toBN(lockedAmount));
+
+        // Execute fixed enter..
+        let tx = await swapFactoryInstance.fixedEnter(lockedAmount, lockedDuration, dealValue);
+        let swap = tx.receipt.logs.find(e => e.event === "Swap").args;
+        let fixedSwapId = swap.fixedSwapId;
+        let swapAddress = await swapTokenInstance.swapIdAddress(fixedSwapId);
+
+        console.log("Have fixed side with id " + fixedSwapId.toString(16) + " at swap contract on " + swapAddress);
+
+        document.getElementById("enter-float-fixed-id").value = fixedSwapId.toString(16);
+        document.getElementById("enter-float-locked-amount").value = lockedAmountInput;
+        document.getElementById("enter-float-locked-duration").value = lockedDuration;
+        document.getElementById("enter-float-deal-value").value = dealValueInput;
+
+        document.getElementById("float-receiver-swap-address").value = swapAddress;
+
+        document.getElementById("exit-fixed-swap-address").value = swapAddress;
+    }
+
+    async function enterFloatSubmit() {
+        console.log("Enter float submit");
+
+        let web3Provider = await getProvider();
+        let web3 = new Web3(web3Provider);
+
+        let fixedSwapIdInput = document.getElementById("enter-float-fixed-id").value;
+        console.log("Fixed swap id: " + fixedSwapIdInput);
+
+        let lockedAmountInput = document.getElementById("enter-float-locked-amount").value;
+        console.log("Collateral to lock up value: " + lockedAmountInput);
+        let lockedAmount = web3.utils.toWei(lockedAmountInput);
+        console.log("Locked amount param: " + lockedAmount);
+
+        let lockedDuration = document.getElementById("enter-float-locked-duration").value;
+        console.log("Locked duration param: " + lockedDuration);
+
+        let dealValueInput = document.getElementById("enter-float-deal-value").value;
+        console.log("Deal value: " + dealValueInput);
+        let dealValue = web3.utils.toWei(dealValueInput);
+        console.log("Deal value param: " + dealValue);
+
+        let accounts = await web3.eth.getAccounts();
+
+        // Set up swap factory contract
+        let swapFactoryJson = await (await fetch("build/contracts/WhittRDaiSwapFactory.json")).json();
+        let swapFactoryContract = TruffleContract(swapFactoryJson);
+
+        swapFactoryContract.setProvider(web3Provider);
+        swapFactoryContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapFactoryInstance = await swapFactoryContract.at(swapFactoryAddress);
+        console.log("Using swap factory contract at " + swapFactoryInstance.address);
+
+        // Set up swap NFT contract
+        let swapTokenJson = await (await fetch("build/contracts/WhittRDaiMoneyToken.json")).json();
+        let swapTokenContract = TruffleContract(swapTokenJson);
+
+        swapTokenContract.setProvider(web3Provider);
+        swapTokenContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapTokenInstance = await swapTokenContract.at(swapTokenAddress);
+        console.log("Using swap token contract at " + swapTokenInstance.address);
+
+        // Verify that the factory can transfer our DAI..
+        await ensureDaiAllowance(web3Provider, web3, web3.utils.toBN(dealValue));
+
+        // Execute fixed enter..
+        let fixedSwapId = web3.utils.toBN("0x" + fixedSwapIdInput);
+        await swapFactoryInstance.floatEnter(fixedSwapId.toString(10), lockedAmount, lockedDuration, dealValue);
+        let floatSwapId = await swapFactoryInstance.calcOtherSideId(fixedSwapId.toString(10));
+        let swapAddress = await swapTokenInstance.swapIdAddress(floatSwapId.toString(10));
+
+        console.log("Have float side with id " + floatSwapId.toString(16) + " at swap contract on " + swapAddress);
+    }
+
+    async function updateFloatReceiverSubmit() {
+        console.log("Update float receiver submit");
+
+        let web3Provider = await getProvider();
+        let web3 = new Web3(web3Provider);
+        let accounts = await web3.eth.getAccounts();
+
+        let swapAddress = document.getElementById("float-receiver-swap-address").value;
+        console.log("Swap address: " + swapAddress);
+
+        let floatReceiverAddress = document.getElementById("float-receiver-receiver-address").value;
+        console.log("Float receiver address: " + floatReceiverAddress);
+
+        let swapMoneyJson = await (await fetch("build/contracts/WhittRDaiMoney.json")).json();
+        let swapMoneyContract = TruffleContract(swapMoneyJson);
+
+        swapMoneyContract.setProvider(web3Provider);
+        swapMoneyContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapMoneyInstance = await swapMoneyContract.at(swapAddress);
+
+        await swapMoneyInstance.updateFloatReceiver(floatReceiverAddress);
+    }
+
+    async function exitFixedSubmit() {
+        console.log("Exit fixed submit");
+
+        let web3Provider = await getProvider();
+        let web3 = new Web3(web3Provider);
+        let accounts = await web3.eth.getAccounts();
+
+        let swapAddress = document.getElementById("exit-fixed-swap-address").value;
+        console.log("Swap address: " + swapAddress);
+
+        let redeemRDaiInput = document.getElementById("exit-fixed-redeem-rdai").value;
+        console.log("Redeem RDai input: " + redeemRDaiInput);
+
+        let swapMoneyJson = await (await fetch("build/contracts/WhittRDaiMoney.json")).json();
+        let swapMoneyContract = TruffleContract(swapMoneyJson);
+
+        swapMoneyContract.setProvider(web3Provider);
+        swapMoneyContract.defaults({
+            from: accounts[0]
+        });
+
+        let swapMoneyInstance = await swapMoneyContract.at(swapAddress);
+
+        await swapMoneyInstance.fixedExit();
+
+        if ("true" === redeemRDaiInput) {
+            let rTokenJson = await (await fetch("build/contracts/RTokenLike.json")).json();
+            let rTokenContract = TruffleContract(rTokenJson);
+
+            rTokenContract.setProvider(web3Provider);
+            rTokenContract.defaults({
+                from: accounts[0]
+            });
+
+            let rTokenInstance = await rTokenContract.at(rtokenAddress);
+
+            console.log("Using rtoken contract at " + rTokenInstance.address);
+
+            await rTokenInstance.redeemAll();
+        }
+    }
+</script>
+
+</body>
+</html>
