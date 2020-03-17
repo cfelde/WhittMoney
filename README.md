@@ -25,3 +25,29 @@ Now let's say that some Richard is willing to pay $6.25K in DAI right now to pro
 ## How we built it
 
 We use rDAI to keep lenders' collateral. Until someone pays the lenders' desired upfront fixed fee, the interest goes to the lender. Once the upfront fixed fee is provided to the contract, it forwards it to the lender and sets interest receiver to the contract that paid the fee, locking the collateral for a given period (a year by default right now). Once the lockdown period ends, the lender can get his collateral back.
+
+The contract architecture is like follows:
+
+There are three contracts involved in any swap setup. Two of these contracts are shared among all swaps (WhittRDaiMoneyToken and WhittRDaiSwapFactory), with the third contract representing the actual swap itself (WhittRDaiMoney).
+
+### WhittRDaiMoneyToken
+
+This contract represents an ERC-721 NFT. It tracks ownership of each side of the swap, and allows through the normal ERC-721 functionality transfer of this ownership. It also includes the option to allocate "spenders", i.e., giving others permission to act on your behalf, if you so wish.
+
+This token contract is not upgradeable itself, but supports the upgrade pattern of WhittRDaiSwapFactory.
+
+### WhittRDaiSwapFactory
+
+The swap factory is the place users interact with in order to create a new swap, and for others to enter into the float side of the swap.
+
+When a new swap is created, this is represented as a separate new contract. It's within the swap factory we deploy these new swap contracts.
+
+The factory implements an upgradeable pattern where by we can inform WhittRDaiMoneyToken that a new factory is now in charge.
+
+### WhitRDaiMoney
+
+This contract is the swap itself. It's deployed by the swap factory, and it's on this contract the collateral is locked. Fixed and float owners interact directly with this contract when they want to either exit fixed (remove collateral) or update float receivers. The contract will check with the token contract regarding ownership and approvals.
+
+## Supporting other tokens
+
+The above three contracts support DAI through rDAI. However, other tokens, like aDAI, can also be supported following a similar pattern. The model can be extended also towards other types of swap setups.
